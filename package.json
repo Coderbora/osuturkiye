@@ -1,0 +1,19 @@
+{
+  "name": "osuturkiye",
+  "version": "1.0.0",
+  "description": "osu!Türkiye",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Coderbora/osuturkiye.git"
+  },
+  "author": "",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/Coderbora/osuturkiye/issues"
+  },
+  "homepage": "https://github.com/Coderbora/osuturkiye#readme"
+}
