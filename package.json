@@ -15,5 +15,15 @@
   "bugs": {
     "url": "https://github.com/Coderbora/osuturkiye/issues"
   },
-  "homepage": "https://github.com/Coderbora/osuturkiye#readme"
+  "homepage": "https://github.com/Coderbora/osuturkiye#readme",
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^3.2.0",
+    "parcel-bundler": "^1.12.4",
+    "vue": "^2.6.12",
+    "vue-router": "^3.5.1",
+    "vue-template-compiler": "^2.6.12"
+  },
+  "dependencies": {
+    "vue-hot-reload-api": "^2.3.4"
+  }
 }
