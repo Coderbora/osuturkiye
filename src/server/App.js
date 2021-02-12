@@ -1,5 +1,6 @@
 const express = require('express')
 const config = require('../../config.json')
+const router = require('./router/index.js')
 
 module.exports = class App {
 
@@ -10,8 +11,7 @@ module.exports = class App {
     }
 
     start() {
-        this.app.use("/", express.static("build/client"));
-        this.app.use("*", express.static("build/client/index.html"));
+        this.app.use("/", router);
 
         return new Promise(async (resolve, reject) => {
             this.httpServer = this.app.listen(config.http.port, config.http.host, (error) => {
