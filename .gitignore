@@ -4,5 +4,6 @@ build/
 .cache/
 dist/
 
+data/
 package-lock.json
 config.json
