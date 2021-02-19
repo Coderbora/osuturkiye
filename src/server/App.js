@@ -1,17 +1,24 @@
 const express = require('express');
 const discord = require('discord.js');
+const mongoose = require('mongoose');
 
 const Logger = require('./Logger.js');
+const osuApi = require('./OsuApiV2.js');
 
 const config = require('../../config.json');
 const router = require('./router/index.js');
 
-module.exports = class App {
+mongoose.Promise = global.Promise
+
+let mInstance = null;
+
+class App {
 
     app = express();
     logger = Logger.get();
     discordClient = new discord.Client();
     httpServer = null;
+    osuApiV2 = osuApi(config.osu.client_id, config.osu.client_secret);
 
     constructor() {
         
@@ -19,6 +26,8 @@ module.exports = class App {
 
     start() {
         this.app.use("/", router);
+
+        mongoose.connect(config.mongo.uri, { autoIndex: false });
 
         this.discordClient.login(config.discord.token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
 
@@ -48,4 +57,10 @@ module.exports = class App {
             });
         });
     }
+}
+
+module.exports = () => {
+    if(mInstance == null)
+        mInstance = new App();
+    return mInstance;
 }

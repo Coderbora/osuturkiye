@@ -1,9 +1,8 @@
-const App = require("./App");
+const App = require("./App")();
 
-const app = new App;
-app.start();
+App.start();
 
 process.on("SIGINT", async () => {
-    await app.stop();
+    await App.stop();
     process.exit(0);
 });

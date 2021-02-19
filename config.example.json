@@ -9,5 +9,12 @@
         "verifiedRole": 0,
         "logChannel": 0,
         "token": ""
+    },
+    "osu": {
+        "client_id": "",
+        "client_secret": ""
+    },
+    "mongo": {
+        "uri": ""
     }
 }
