@@ -8,13 +8,19 @@
         "guildID": 0,
         "verifiedRole": 0,
         "logChannel": 0,
+
+        "clientId": "",
+        "clientSecret": "",
         "token": ""
     },
     "osu": {
-        "client_id": "",
-        "client_secret": ""
+        "clientId": "",
+        "clientSecret": ""
     },
     "mongo": {
         "uri": ""
+    },
+    "session": {
+        "secret": ""
     }
 }

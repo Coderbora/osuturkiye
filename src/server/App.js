@@ -27,7 +27,7 @@ class App {
     start() {
         this.app.use("/", router);
 
-        mongoose.connect(config.mongo.uri, { autoIndex: false });
+        mongoose.connect(config.mongo.uri, { autoIndex: false, useNewUrlParser: true });
 
         this.discordClient.login(config.discord.token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
 
@@ -60,7 +60,9 @@ class App {
 }
 
 module.exports = () => {
-    if(mInstance == null)
+    if(mInstance == null) {
         mInstance = new App();
+        global.app = mInstance;
+    }
     return mInstance;
 }

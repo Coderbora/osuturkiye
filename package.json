@@ -28,10 +28,14 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "connect-mongo": "^3.2.0",
     "discord.js": "^12.5.1",
     "express": "^4.17.1",
     "express-promise-router": "^4.0.1",
+    "express-session": "^1.17.1",
     "mongoose": "^5.11.16",
+    "passport-discord": "^0.1.4",
+    "passport-osu": "^1.0.7",
     "simple-oauth2": "^4.2.0",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"

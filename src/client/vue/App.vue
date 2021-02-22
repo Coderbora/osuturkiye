@@ -7,11 +7,16 @@
             </div>
             <p>osu! hesabınız ile Discord hesabınızı bağlayın!</p>
             <div class="actionbar">
-                <button @click="connectOsuAccount()">
-                    <i id="osu" class="fas fa-circle"></i> osu!
+                <button :disabled="user.osuLinked" @click="connectOsuAccount()">
+                    <template v-if="!user.osuLinked">
+                        <i id="osu" class="fas fa-circle"></i> osu!
+                    </template>
+                    <template v-else>
+                        <i id="osu" class="fa fa-check"></i> {{ user.username }}
+                    </template>
                 </button>
                 <i class="between fas fa-plus"></i>
-                <button :disabled="!osuAuthenticated">
+                <button :disabled="!user.osuLinked && !user.discordLinked">
                     <i id="discord" class="fab fa-discord"></i> Discord
                 </button>
             </div>
@@ -19,22 +24,39 @@
     </div>
 </template>
 <script>
+import axios from "axios";
+import regeneratorRuntime from "regenerator-runtime";
 
 export default {
     name: "App",
     data: () => { return {
-        osuAuthenticated: false,
-        osuAccount: {}
+        user: {
+            osuLinked: false,
+            discordLinked: false
+        }
     }},
     methods: {
+        reloadData() {
+            axios.get("/api/user").then(res => {
+                let data = res.data.user;
+                if(data) {
+                    this.user = data;
+                }
+            })
+        },
         connectOsuAccount() {
-            let icon = document.getElementById("osu")
-            icon.classList.remove("fa-circle");
-            icon.classList.add("fa-spinner");
-            icon.classList.add("fa-spin");
+            if(!this.user.osuLinked) {
+                let icon = document.getElementById("osu")
+                icon.classList.remove("fa-circle");
+                icon.classList.add("fa-spinner");
+                icon.classList.add("fa-spin");
 
-            window.location.href = "/api/auth/osu"
+                window.location.href = "/api/auth/osu"
+            }
         }
+    },
+    mounted() {
+        this.reloadData();
     }
 }
 </script>
