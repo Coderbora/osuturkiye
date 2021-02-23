@@ -105,7 +105,7 @@ button {
     transition: all .5s ease;
     color: #fff;
     border: 2px solid white;
-    font-family:'Montserrat', sans-serif;
+    font-family: 'Comfortaa', cursive;
     text-align: center;
     line-height: 1;
     font-size: 20px;
