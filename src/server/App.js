@@ -1,8 +1,8 @@
 const express = require('express');
-const discord = require('discord.js');
 const mongoose = require('mongoose');
 
 const Logger = require('./Logger.js');
+const DiscordClient = require('./DiscordClient.js')();
 const osuApi = require('./OsuApiV2.js');
 
 const config = require('../../config.json');
@@ -16,7 +16,6 @@ class App {
 
     app = express();
     logger = Logger.get();
-    discordClient = new discord.Client();
     httpServer = null;
     osuApiV2 = osuApi(config.osu.client_id, config.osu.client_secret);
 
@@ -29,7 +28,7 @@ class App {
 
         mongoose.connect(config.mongo.uri, { autoIndex: false, useNewUrlParser: true });
 
-        this.discordClient.login(config.discord.token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
+        DiscordClient.start(config.discord.token);
 
         return new Promise(async (resolve, reject) => {
             this.httpServer = this.app.listen(config.http.port, config.http.host, (error) => {
@@ -46,7 +45,7 @@ class App {
     stop() {
         this.logger.info("Stopping the app!");
         return new Promise(async (resolve, reject) => {
-            await this.discordClient.destroy();
+            await DiscordClient.stop();
             this.httpServer.close((error) => {
                 if(error) {
                     this.logger.error("Error while closing the http server!", { error });

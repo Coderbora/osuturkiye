@@ -35,25 +35,22 @@ passport.use('discord', new DiscordStrategy({
     clientID: config.discord.clientId,
     clientSecret: config.discord.clientSecret,
     callbackURL: config.http.publicUrl + "/api/auth/discord/callback",
-}, async (accessToken, refreshToken, profile, done) => {
-    try {
-        let user = await User.findOne({ "discord.userId": profile.id });
-        if(user)
-            user.lastLogin = user.discord.lastVerified = new Date();
-        else
-            user = new User({
-                discord: {
-                    userId: profile.id,
-                },
-            });
+    passReqToCallback: true
+}, async (req, accessToken, refreshToken, profile, done) => {
+    if(req.user) {
+        try {
+            if(!req.user.discord) 
+                req.user.discord = { userId: profile.id };
 
-        user.discord.accessToken = accessToken;
-        user.discord.refreshToken = refreshToken;
-        await user.save();
-        done(null, user);
-    } catch(error) {
-        passportLogger.error("Error while authenticating user via Discord", { error });
-        done(error);
+            req.user.discord.userNameWithDiscriminator = `${profile.username}#${profile.discriminator}`;
+            req.user.discord.accessToken = accessToken;
+            req.user.discord.refreshToken = refreshToken;
+            await req.user.save();
+            done(null, req.user);
+        } catch(error) {
+            passportLogger.error("Error while authenticating user via Discord", { error });
+            done(error);
+        }
     }
 }));
 

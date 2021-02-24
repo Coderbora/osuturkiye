@@ -14,10 +14,11 @@ const OsuInformationSchema = new mongoose.Schema({
 
 const DiscordInformationSchema = new mongoose.Schema({
     userId: String,
+    userNameWithDiscriminator: String,
     accessToken: String,
     refreshToken: String,
-    dateAdded: Date,
-    lastVerified: Date
+    dateAdded: { type: Date, default: Date.now() },
+    lastVerified: { type: Date, default: Date.now() }
 })
 
 const UserSchema = new mongoose.Schema({
@@ -59,6 +60,7 @@ UserSchema.methods.getInfos = async function() {
         osuID: this.osu ? this.osu.userId : null,
         username: this.osu ? this.osu.username : null,
         discordID: this.discord ? this.discord.userId : null,
+        discordName: this.discord ? this.discord.userNameWithDiscriminator : null,
         osuLinked: this.osu != null,
         discordLinked: this.discord != null
     }

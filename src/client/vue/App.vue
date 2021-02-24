@@ -16,8 +16,14 @@
                     </template>
                 </button>
                 <i class="between fas fa-plus"></i>
-                <button :disabled="!user.osuLinked && !user.discordLinked">
-                    <i id="discord" class="fab fa-discord"></i> Discord
+                <button :disabled="!user.osuLinked && !user.discordLinked" @click="connectDiscordAccount()">
+                    <template v-if="!user.discordLinked">
+                        <i id="discord" class="fab fa-discord"></i> Discord
+                    </template>
+                    <template v-else>
+                        <i id="discord" class="fa fa-check"></i> {{ user.discordName }}
+                    </template>
+                    
                 </button>
             </div>
         </div>
@@ -52,6 +58,18 @@ export default {
                 icon.classList.add("fa-spin");
 
                 window.location.href = "/api/auth/osu"
+            }
+        },
+        connectDiscordAccount() {
+            if(!this.user.discordLinked) {
+                let icon = document.getElementById("discord")
+                icon.classList.remove("fab");
+                icon.classList.remove("fa-discord");
+                icon.classList.add("fas");
+                icon.classList.add("fa-spinner");
+                icon.classList.add("fa-spin");
+
+                window.location.href = "/api/auth/discord"
             }
         }
     },

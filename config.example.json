@@ -5,9 +5,9 @@
         "publicUrl": ""
     },
     "discord": {
-        "guildID": 0,
-        "verifiedRole": 0,
-        "logChannel": 0,
+        "guildID": "",
+        "verifiedRole": "",
+        "logChannel": "",
 
         "clientId": "",
         "clientSecret": "",
