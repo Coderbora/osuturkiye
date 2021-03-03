@@ -1,8 +1,9 @@
 const App = require("./App")();
 
-App.start();
+(async () => { 
+    await App.start();
 
-process.on("SIGINT", async () => {
-    await App.stop();
-    process.exit(0);
-});
+    process.on("SIGINT", async () => {
+        await App.stop();
+        process.exit(0);
+    }); })();

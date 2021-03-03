@@ -23,12 +23,12 @@ class App {
         
     }
 
-    start() {
+    async start() {
         this.app.use("/", router);
 
         mongoose.connect(config.mongo.uri, { autoIndex: false, useNewUrlParser: true });
 
-        DiscordClient.start(config.discord.token);
+        await DiscordClient.start(config.discord.token);
 
         return new Promise(async (resolve, reject) => {
             this.httpServer = this.app.listen(config.http.port, config.http.host, (error) => {

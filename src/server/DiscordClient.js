@@ -7,13 +7,14 @@ let mInstance = null;
 class DiscordClient { 
 
     static discordClient = null;
+    logChannel = null;
 
     constructor() {
         this.discordClient = new discord.Client()
     }
 
-    start(token) {
-        this.discordClient.login(token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
+    async start(token) {
+        await this.discordClient.login(token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
     }
 
     async stop() {
@@ -22,6 +23,23 @@ class DiscordClient {
 
     get discordGuild() {
         return this.discordClient.guilds.resolve(config.discord.guildID);
+    }
+
+    async log(info) {
+        if(config.level_colors.hasOwnProperty(info.level)) {
+            
+            if(!this.logChannel)
+                this.logChannel = await this.discordClient.channels.fetch(config.discord.logChannel);
+
+            await this.logChannel.send({
+                embed: {
+                    title: info.label ? info.label : "",
+                    description: info.message,
+                    timestamp: info.timestamp,
+                    color: config.level_colors[info.level]
+                }
+            })
+        }
     }
 }
 

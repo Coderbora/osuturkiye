@@ -22,5 +22,11 @@
     },
     "session": {
         "secret": ""
+    },
+    "level_colors": {
+        "info": "17A2B8",
+        "notice": "17A2B8",
+        "warn": "FFC107",
+        "error": "DC3545"
     }
 }

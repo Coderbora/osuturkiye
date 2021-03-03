@@ -1,5 +1,18 @@
 const winston = require('winston');
 const winstonDailyRotateFile = require('winston-daily-rotate-file');
+const Transport = require('winston-transport');
+
+const DiscordClient = require('./DiscordClient.js')();
+
+class DiscordTransport extends Transport {
+    constructor(opts) {
+        super(opts)
+    }
+    log(info, callback) {
+        DiscordClient.log(info);
+        callback();
+    }
+}
 
 module.exports = class Logger {
     static transports = [
@@ -9,6 +22,7 @@ module.exports = class Logger {
             filename: "%DATE%.log",
             level: "info",
         }),
+        new DiscordTransport()
     ];
 
     static get(label) {
