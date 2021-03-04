@@ -31,14 +31,14 @@ class DiscordClient {
             if(!this.logChannel)
                 this.logChannel = await this.discordClient.channels.fetch(config.discord.logChannel);
 
-/*            await this.logChannel.send({
+            await this.logChannel.send({
                 embed: {
                     title: info.label ? info.label : "",
                     description: info.message,
                     timestamp: info.timestamp,
                     color: config.level_colors[info.level]
                 }
-            })*/
+            })
         }
     }
 
