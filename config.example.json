@@ -6,7 +6,22 @@
     },
     "discord": {
         "guildID": "",
-        "verifiedRole": "",
+        "roles": {
+            "verifiedRole": "",
+            "groupRoles": {
+                "gmt": "",
+                "bng": "",
+                "alumni": ""
+            },
+            "playModeRoles": {
+                "osu": "",
+                "mania": "",
+                "taiko": "",
+                "fruits": ""
+            },
+            "rankedMapper": ""
+        },
+
         "logChannel": "",
 
         "clientId": "",

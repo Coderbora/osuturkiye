@@ -15,22 +15,14 @@ router.get("/", isDatabaseAvailable, isAuthenticated, passport.authenticate("dis
 
 router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { failureRedirect: "/" }) , async (req, res) => {
     
-    let discordMember = null;
-
-    //check if member exists
-    try {
-        discordMember = await DiscordClient.discordGuild.members.fetch(req.user.discord.userId);
-    } catch(err) {
-        if(!(err instanceof DiscordAPIError && err.code === 10007))
-            throw err;
-    }
+    let discordMember = DiscordClient.fetchMember(req.user.discord.userId);
     
     if (!discordMember) {
         try {
             await DiscordClient.discordGuild.addMember(req.user.discord.userId, {
                 accessToken: req.user.discord.accessToken,
                 nick: req.user.osu.username,
-                roles: [config.discord.verifiedRole]
+                roles: [config.discord.roles.verifiedRole, config.discord.roles.playModeRoles[req.user.osu.playmode]]
             });
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 30001))
@@ -38,7 +30,7 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
         }
     } else {
         await Promise.all([
-            discordMember.roles.add(config.discord.verifiedRole),
+            discordMember.roles.add([config.discord.roles.verifiedRole, config.discord.roles.playModeRoles[req.user.osu.playmode]]),
             discordMember.setNickname(req.user.osu.username),
         ]);
     }

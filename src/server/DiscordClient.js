@@ -1,6 +1,7 @@
 const discord = require('discord.js');
 const Logger = require('./Logger.js');
 const config = require('../../config.json');
+const { DiscordAPIError } = require("discord.js");
 
 let mInstance = null;
 
@@ -27,19 +28,31 @@ class DiscordClient {
 
     async log(info) {
         if(config.level_colors.hasOwnProperty(info.level)) {
-            
             if(!this.logChannel)
                 this.logChannel = await this.discordClient.channels.fetch(config.discord.logChannel);
 
-            await this.logChannel.send({
+/*            await this.logChannel.send({
                 embed: {
                     title: info.label ? info.label : "",
                     description: info.message,
                     timestamp: info.timestamp,
                     color: config.level_colors[info.level]
                 }
-            })
+            })*/
         }
+    }
+
+    async fetchMember(id) {
+        let discordMember = null;
+
+        try {
+            discordMember = await this.discordGuild.members.fetch(id);
+        } catch(err) {
+            if(!(err instanceof DiscordAPIError && err.code === 10007))
+                throw err;
+        }
+
+        return discordMember;
     }
 }
 
