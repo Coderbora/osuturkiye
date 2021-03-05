@@ -34,10 +34,17 @@ const UserSchema = new mongoose.Schema({
 })
 
 OsuInformationSchema.methods.fetchUser = async function() {
+    if(Date.now() - this.lastVerified > 86400) { // expires after one day
+        const tokenRet = await osuApi.refreshAccessToken(this.refreshToken);
+        this.accessToken = tokenRet.access_token;
+        this.refreshToken = tokenRet.refresh_token;
+        this.lastVerified = Date.now();
+    }
+
     const ret = await osuApi.fetchUser(null, this.accessToken, null)
     this.username = ret.username;
     this.playmode = ret.playmode;
-    this.groups = ret.groups;
+    this.groups = ret.groups.map(e => e["identifier"]);
     this.isRankedMapper = ret.ranked_and_approved_beatmapset_count > 0;
     await (this.ownerDocument()).save();
 };
@@ -63,6 +70,8 @@ DiscordInformationSchema.methods.updateUser = async function() {
             await discordMember.roles.add(config.discord.roles.rankedMapper);
         else
             await discordMember.roles.remove(config.discord.roles.rankedMapper);
+
+        await discordMember.roles.add(config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
             await discordMember.setNickname(this.ownerDocument().osu.username);
@@ -93,7 +102,6 @@ UserSchema.statics.deserializeUser = async function(id, done) {
 };
 
 UserSchema.methods.getInfos = async function() {
-    await this.osu.fetchUser();
     return {
         id: this.id,
         lastLogin: this.lastLogin,
@@ -108,8 +116,16 @@ UserSchema.methods.getInfos = async function() {
 }
 
 
-UserSchema.methods.getAvatarUrl = async function(discordAvatarId) {
-
+UserSchema.methods.updateUser = function() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await this.osu.fetchUser();
+            await this.discord.updateUser();
+            resolve();
+        } catch(err) {
+            reject(err);
+        }
+    })
 }
 
 const User = mongoose.model('User', UserSchema)

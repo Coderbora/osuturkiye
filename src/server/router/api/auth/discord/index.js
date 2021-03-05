@@ -22,7 +22,7 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
             await DiscordClient.discordGuild.addMember(req.user.discord.userId, {
                 accessToken: req.user.discord.accessToken,
                 nick: req.user.osu.username,
-                roles: [config.discord.roles.verifiedRole, config.discord.roles.playModeRoles[req.user.osu.playmode]]
+                roles: [config.discord.roles.verifiedRole]
             });
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 30001))
@@ -30,10 +30,15 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
         }
     } else {
         await Promise.all([
-            discordMember.roles.add([config.discord.roles.verifiedRole, config.discord.roles.playModeRoles[req.user.osu.playmode]]),
+            discordMember.roles.add(config.discord.roles.verifiedRole),
             discordMember.setNickname(req.user.osu.username),
         ]);
     }
+
+    await Promise.all([
+        req.user.osu.fetchUser(),
+        req.user.discord.updateUser()
+    ])
     
     res.redirect("/");
 });
