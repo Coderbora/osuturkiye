@@ -15,7 +15,7 @@ router.get("/", isDatabaseAvailable, isAuthenticated, passport.authenticate("dis
 
 router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { failureRedirect: "/" }) , async (req, res) => {
     
-    let discordMember = DiscordClient.fetchMember(req.user.discord.userId);
+    let discordMember = await DiscordClient.fetchMember(req.user.discord.userId);
     
     if (!discordMember) {
         try {
@@ -28,11 +28,6 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
             if(!(err instanceof DiscordAPIError && err.code === 30001))
                 throw err;
         }
-    } else {
-        await Promise.all([
-            discordMember.roles.add(config.discord.roles.verifiedRole),
-            discordMember.setNickname(req.user.osu.username),
-        ]);
     }
 
     await Promise.all([
@@ -43,6 +38,16 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
     res.redirect("/");
 });
 
+router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req, res) => {
+    const osuID = req.user.osu.userId;
+    const discordID = req.user.discord.userId;
 
+    await req.user.discord.delink();
+    req.user.discord = null;
+    await req.user.save();
+
+    logger.info(`${req.user.getUsername()} (${osuID}) (Discord ID: ${discordID}) has delinked their Discord account.`);
+    return res.json({ error: false });
+})
 
 module.exports = router;

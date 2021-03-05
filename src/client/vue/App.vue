@@ -7,7 +7,7 @@
             </div>
             <p>osu! hesabınız ile Discord hesabınızı bağlayın!</p>
             <div class="actionbar">
-                <button :disabled="user.osuLinked" @click="connectOsuAccount()">
+                <button @click="osuAction()">
                     <template v-if="!user.osuLinked">
                         <i id="osu" class="fas fa-circle"></i> osu!
                     </template>
@@ -16,7 +16,7 @@
                     </template>
                 </button>
                 <i class="between fas fa-plus"></i>
-                <button :disabled="!user.osuLinked && !user.discordLinked" @click="connectDiscordAccount()">
+                <button :disabled="!user.osuLinked && !user.discordLinked" @click="discordAction()">
                     <template v-if="!user.discordLinked">
                         <i id="discord" class="fab fa-discord"></i> Discord
                     </template>
@@ -39,6 +39,10 @@ export default {
         user: {
             osuLinked: false,
             discordLinked: false
+        },
+        defaultUser: {
+            osuLinked: false,
+            discordLinked: false
         }
     }},
     methods: {
@@ -47,29 +51,50 @@ export default {
                 let data = res.data.user;
                 if(data) {
                     this.user = data;
+                } else {
+                    this.user = this.defaultUser;
                 }
             })
         },
-        connectOsuAccount() {
-            if(!this.user.osuLinked) {
-                let icon = document.getElementById("osu")
-                icon.classList.remove("fa-circle");
-                icon.classList.add("fa-spinner");
-                icon.classList.add("fa-spin");
-
-                window.location.href = "/api/auth/osu"
+        loadingAnimation(button) {
+            let icon;
+            switch (button) {
+                case "osu":
+                    icon = document.getElementById("osu")
+                    icon.classList.toggle("fa-circle");
+                    icon.classList.toggle("fa-spinner");
+                    icon.classList.toggle("fa-spin");
+                    break;
+                case "discord":
+                    icon = document.getElementById("discord")
+                    icon.classList.toggle("fab");
+                    icon.classList.toggle("fa-discord");
+                    icon.classList.toggle("fas");
+                    icon.classList.toggle("fa-spinner");
+                    icon.classList.toggle("fa-spin");
+                    break;
             }
         },
-        connectDiscordAccount() {
+        async osuAction() {
+            if(!this.user.osuLinked) {
+                this.loadingAnimation("osu");
+                window.location.href = "/api/auth/osu"
+            } else {
+                this.loadingAnimation("osu");
+                await axios.get("/api/auth/logout");
+                this.reloadData();
+                this.loadingAnimation("osu");
+            }
+        },
+        async discordAction() {
             if(!this.user.discordLinked) {
-                let icon = document.getElementById("discord")
-                icon.classList.remove("fab");
-                icon.classList.remove("fa-discord");
-                icon.classList.add("fas");
-                icon.classList.add("fa-spinner");
-                icon.classList.add("fa-spin");
-
+                this.loadingAnimation("discord");
                 window.location.href = "/api/auth/discord"
+            } else {
+                this.loadingAnimation("discord");
+                await axios.get("/api/auth/discord/delink");
+                this.reloadData();
+                this.loadingAnimation("discord");
             }
         }
     },

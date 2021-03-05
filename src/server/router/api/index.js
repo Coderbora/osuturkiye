@@ -70,8 +70,8 @@ passport.use("osu", new OsuStrategy({
                 },
             });
 
-        user.osu.playmode = profile.playmode;
-        user.osu.username = profile.username;
+        user.osu.playmode = profile._json.playmode;
+        user.osu.username = profile._json.username;
 
         user.osu.accessToken = accessToken;
         user.osu.refreshToken = refreshToken;

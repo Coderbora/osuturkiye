@@ -74,7 +74,7 @@ DiscordInformationSchema.methods.updateUser = async function() {
         await discordMember.roles.add(config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
-            await discordMember.setNickname(this.ownerDocument().osu.username);
+            await discordMember.setNickname(this.ownerDocument().getUsername());
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
             throw err;
@@ -84,6 +84,30 @@ DiscordInformationSchema.methods.updateUser = async function() {
         await (this.ownerDocument()).save();
     }
 };
+
+DiscordInformationSchema.methods.delink = async function() {
+    let discordMember = await DiscordClient.fetchMember(this.userId);
+    if(discordMember) {
+        Object.keys(config.discord.roles.groupRoles).forEach(async group => {
+            await discordMember.roles.remove(config.discord.roles.groupRoles[group]);
+        });
+        Object.keys(config.discord.roles.playModeRoles).forEach(async playmode => {
+            await discordMember.roles.remove(config.discord.roles.playModeRoles[playmode]);
+        });
+
+        await discordMember.roles.remove([config.discord.roles.verifiedRole, config.discord.roles.rankedMapper]);
+    
+        try{ //in case of permission error during updating
+            await discordMember.setNickname("");
+        } catch(err) {
+            if(!(err instanceof DiscordAPIError && err.code === 50013))
+            throw err;
+        }
+
+        this.lastUpdated = Date.now();
+        await (this.ownerDocument()).save();
+    }
+}
 
 UserSchema.statics.serializeUser = function(user, done) {
     done(null, user && user.id ? user.id : null);
@@ -126,6 +150,15 @@ UserSchema.methods.updateUser = function() {
             reject(err);
         }
     })
+}
+
+UserSchema.methods.getUsername = function() {
+    if(this.osu && this.osu.username)
+        return this.osu.username;
+    else if(this.discord && this.discord.userNameWithDiscriminator)
+        return this.discord.userNameWithDiscriminator;
+    else
+        return "UNKNOWN";
 }
 
 const User = mongoose.model('User', UserSchema)
