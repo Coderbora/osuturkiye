@@ -26,7 +26,7 @@ class Cron {
     }
 
     stop() {
-        this.tasks.forEach((job) => job.stop());
+        this.tasks.forEach((task) => task.stop());
     }
 
 }

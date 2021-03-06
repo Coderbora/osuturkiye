@@ -46,7 +46,7 @@ router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req, res) => 
     req.user.discord = null;
     await req.user.save();
 
-    logger.info(`${req.user.getUsername()} (${osuID}) (Discord ID: ${discordID}) has delinked their Discord account.`);
+    logger.info(`**${req.user.getUsername()}** \`osu ID: ${osuID}\` \`Discord ID: ${discordID}\` has delinked their Discord account.`);
     return res.json({ error: false });
 })
 

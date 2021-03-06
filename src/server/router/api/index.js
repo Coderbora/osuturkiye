@@ -9,6 +9,7 @@ const OsuStrategy = require('passport-osu').default;
 
 const Logger = require("../../Logger.js");
 const { User } = require("../../models/User");
+const ErrorCode = require("../../models/ErrorCodes.js");
 
 const authRouter = require("./auth/index.js");
 const userRouter = require("./user/index.js");
@@ -95,7 +96,7 @@ router.use("/auth", authRouter);
 router.use("/user", userRouter);
 
 router.use("*", (req, res) => {
-    res.status(404).send("404 - Not Found")
+    res.status(404).json({ error: ErrorCode.NOT_FOUND })
 })
 
 module.exports = router;
