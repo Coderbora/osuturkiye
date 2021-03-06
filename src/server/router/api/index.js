@@ -16,7 +16,10 @@ const userRouter = require("./user/index.js");
 const { isDatabaseAvailable } = require("../../middlewares.js")
 const config = require("../../../../config.json");
 
-router.use("/", isDatabaseAvailable);
+router.use("/", isDatabaseAvailable, (req, res, next) => {
+    req.api = true;
+    next();
+}); 
 
 router.use(session({
     secret: config.session.secret,
