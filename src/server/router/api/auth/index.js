@@ -7,7 +7,7 @@ router.use("/osu", osuRouter)
 router.use("/discord", discordRouter)
 
 router.get("/logout", isAuthenticated, (req, res) => {
-    req.session.destroy(null);
+    req.session.destroy();
     req.logout();
     res.json({ error: false });
 });

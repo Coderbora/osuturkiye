@@ -1,8 +1,7 @@
 const router = require("express-promise-router")();
 const session = require("express-session");
 const passport = require("passport");
-const mongoose = require("mongoose");
-const connectMongo = require("connect-mongo");
+const MongoStore  = require("connect-mongo").default;
 
 const DiscordStrategy = require("passport-discord").Strategy;
 const OsuStrategy = require('passport-osu').default;
@@ -19,10 +18,9 @@ const config = require("../../../../config.json");
 
 router.use("/", isDatabaseAvailable);
 
-const MongoStore = connectMongo(session);
 router.use(session({
     secret: config.session.secret,
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    store: MongoStore.create({ mongoUrl: config.mongo.uri }),
     cookie: {
         maxAge: 7*24*60*60*1000
     },
