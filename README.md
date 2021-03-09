@@ -9,5 +9,9 @@ This project is still under development in sub-branches, if you want to contribu
 Firstly, you need to copy the `config.example.json` for your actual-use config file: `config.json`
 
 Then, you can edit values about the project. 
+
+### Building front-end
+You can build the front-end with `npm run build` command.
+
 ### Running the project
-After creating config file, you are ready to run the project with `npm run start`
+After creating config file and building the front-end, you are ready to run the project with `npm run start`
