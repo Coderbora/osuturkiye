@@ -52,28 +52,34 @@ OsuInformationSchema.methods.fetchUser = async function() {
 DiscordInformationSchema.methods.updateUser = async function() {
     let discordMember = await DiscordClient.fetchMember(this.userId);
     if(discordMember) {
+
+        let addArray, removeArray = [];
+
         Object.keys(config.discord.roles.groupRoles).forEach(async group => {
             if(this.ownerDocument().osu.groups.includes(group))
-                await discordMember.roles.add(config.discord.roles.groupRoles[group]);
+                addArray.push(config.discord.roles.groupRoles[group]);
             else
-                await discordMember.roles.remove(config.discord.roles.groupRoles[group]);
+                removeArray.push(config.discord.roles.groupRoles[group]);
         });
 
         Object.keys(config.discord.roles.playModeRoles).forEach(async playmode => {
             if(this.ownerDocument().osu.playmode == playmode)
-                await discordMember.roles.add(config.discord.roles.playModeRoles[playmode]);
+                addArray.push(config.discord.roles.playModeRoles[playmode]);
             else 
-                await discordMember.roles.remove(config.discord.roles.playModeRoles[playmode]);
+                removeArray.push(config.discord.roles.playModeRoles[playmode]);
         });
 
         if (this.ownerDocument().osu.isRankedMapper) 
-            await discordMember.roles.add(config.discord.roles.rankedMapper);
+            addArray.push(config.discord.roles.rankedMapper);
         else
-            await discordMember.roles.remove(config.discord.roles.rankedMapper);
+            removeArray.push(config.discord.roles.rankedMapper);
 
-        await discordMember.roles.add(config.discord.roles.verifiedRole);
+        addArray.push(config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
+            await discordMember.roles.remove(removeArray);
+            await discordMember.roles.add(addArray);
+
             await discordMember.setNickname(this.ownerDocument().getUsername());
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))

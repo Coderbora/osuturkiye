@@ -30,10 +30,7 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
         }
     }
 
-    await Promise.all([
-        req.user.osu.fetchUser(),
-        req.user.discord.updateUser()
-    ])
+    await req.user.updateUser();
     
     res.redirect("/");
 });
