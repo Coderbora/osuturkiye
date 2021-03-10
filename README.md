@@ -5,10 +5,14 @@
 This project is still under development in sub-branches, if you want to contribute you can contact us on our Discord server!
 
 # Installation
-### Creating config file
-Firstly, you need to copy the `config.example.json` for your actual-use config file: `config.json`
 
-Then, you can edit values about the project. 
+### Installing dependencies
+Firstly, you need to install dependencies with `npm install` command.
+
+### Creating config file
+Then, you need to copy the `config.example.json` for your actual-use config file: `config.json`
+
+With this action, you can edit values about the project. 
 
 ### Building front-end
 You can build the front-end with `npm run build` command.
