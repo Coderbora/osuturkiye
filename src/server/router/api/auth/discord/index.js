@@ -30,7 +30,8 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
         }
     }
 
-    await req.user.updateUser();
+    await req.user.osu.fetchUser();
+    await req.user.discord.updateUser();
     
     res.redirect("/");
 });
