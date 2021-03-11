@@ -4,6 +4,15 @@
         "port": "",
         "publicUrl": ""
     },
+    "https": {
+        "enable": true,
+        "host": "",
+        "port": "",
+        "publicUrl": "",
+
+        "privateKeyPath": "",
+        "certificatePath": ""
+    },
     "discord": {
         "guildID": "",
         "roles": {
