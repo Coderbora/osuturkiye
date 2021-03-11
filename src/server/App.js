@@ -1,6 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const path = require('path');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
 const Logger = require('./Logger.js');
 const DiscordClient = require('./DiscordClient.js')();
 const Cron = require('./Cron.js')();
@@ -17,13 +22,23 @@ class App {
     app = express();
     logger = Logger.get();
     httpServer = null;
+    httpsServer = null;
+    credentials = {};
 
     constructor() {
         
     }
 
     async start() {
+        this.app.use(express.static(path.join(__dirname, "static"), { dotfiles: 'allow' }));
         this.app.use("/", router);
+
+        if (config.https.enable) {
+            this.credentials = {
+                key: fs.readFileSync(config.https.privateKeyPath, 'utf8'),
+                cert: fs.readFileSync(config.https.certificatePath, 'utf8')
+            }
+        }
 
         mongoose.connect(config.mongo.uri, { autoIndex: false, useNewUrlParser: true });
 
@@ -32,14 +47,27 @@ class App {
         Cron.init();
 
         return new Promise(async (resolve, reject) => {
-            this.httpServer = this.app.listen(config.http.port, config.http.host, (error) => {
+            this.httpServer = http.createServer(this.app);
+            this.httpServer.listen(config.http.port, config.http.host, (error) => {
                 if(error) {
-                    this.logger.error("Error while listening!", { error });
+                    this.logger.error("Error while listening http port!", { error });
                     return reject(error);
                 }
-                this.logger.info(`Listening requests on ${config.http.publicUrl} !`);
-                resolve(this.httpServer);
+                this.logger.info(`Listening HTTP requests on ${config.http.publicUrl} !`);
             });
+
+            if (config.https.enable) {
+                this.httpsServer = https.createServer(this.credentials, this.app);
+                this.httpsServer.listen(config.https.port, config.https.host, (error) => {
+                    if(error) {
+                        this.logger.error("Error while listening https port!", { error });
+                        return reject(error);
+                    }
+                    this.logger.info(`Listening HTTPS requests on ${config.https.publicUrl} !`);
+                });
+            }
+
+            resolve();
         }); 
     }
 
@@ -53,9 +81,19 @@ class App {
                     this.logger.error("Error while closing the http server!", { error });
                     return reject(error);
                 }
-                this.logger.info("Stopped the app!");
-                resolve();
             });
+
+            if(config.https.enable) {
+                this.httpsServer.close((error) => {
+                    if(error) {
+                        this.logger.error("Error while closing the https server!", { error });
+                        return reject(error);
+                    }
+                });    
+            }
+
+            this.logger.info("Stopped the app!");
+            resolve();
         });
     }
 }
