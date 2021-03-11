@@ -23,6 +23,7 @@ class App {
     logger = Logger.get();
     httpServer = null;
     httpsServer = null;
+    credentials = {};
 
     constructor() {
         
@@ -33,7 +34,7 @@ class App {
         this.app.use("/", router);
 
         if (config.https.enable) {
-            credentials = {
+            this.credentials = {
                 key: fs.readFileSync(config.https.privateKeyPath, 'utf8'),
                 cert: fs.readFileSync(config.https.certificatePath, 'utf8')
             }
@@ -56,7 +57,7 @@ class App {
             });
 
             if (config.https.enable) {
-                this.httpsServer = https.createServer(credentials, this.app);
+                this.httpsServer = https.createServer(this.credentials, this.app);
                 this.httpsServer.listen(config.https.port, config.https.host, (error) => {
                     if(error) {
                         this.logger.error("Error while listening https port!", { error });
