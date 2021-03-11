@@ -5,11 +5,6 @@ const ErrorCode = require("../models/ErrorCodes.js");
 
 const Logger = require("../Logger.js");
 
-// https re-write function
-http.get('*', function(req, res) {  
-    res.redirect('https://' + req.headers.host + req.url);
-})
-
 router.use("/api", apiRouter);
 
 router.use("/", express.static("build/client"));
