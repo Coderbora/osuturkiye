@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
 })
 
 OsuInformationSchema.methods.fetchUser = async function() {
-    if(Date.now() - this.lastVerified > 86400) { // expires after one day
+    if(Date.now() - this.lastVerified.getTime() > 86400000) { // expires after one day
         const tokenRet = await osuApi.refreshAccessToken(this.refreshToken);
         this.accessToken = tokenRet.access_token;
         this.refreshToken = tokenRet.refresh_token;
@@ -52,28 +52,34 @@ OsuInformationSchema.methods.fetchUser = async function() {
 DiscordInformationSchema.methods.updateUser = async function() {
     let discordMember = await DiscordClient.fetchMember(this.userId);
     if(discordMember) {
+
+        let addArray = [], removeArray = [];
+
         Object.keys(config.discord.roles.groupRoles).forEach(async group => {
             if(this.ownerDocument().osu.groups.includes(group))
-                await discordMember.roles.add(config.discord.roles.groupRoles[group]);
+                addArray.push(config.discord.roles.groupRoles[group]);
             else
-                await discordMember.roles.remove(config.discord.roles.groupRoles[group]);
+                removeArray.push(config.discord.roles.groupRoles[group]);
         });
 
         Object.keys(config.discord.roles.playModeRoles).forEach(async playmode => {
             if(this.ownerDocument().osu.playmode == playmode)
-                await discordMember.roles.add(config.discord.roles.playModeRoles[playmode]);
+                addArray.push(config.discord.roles.playModeRoles[playmode]);
             else 
-                await discordMember.roles.remove(config.discord.roles.playModeRoles[playmode]);
+                removeArray.push(config.discord.roles.playModeRoles[playmode]);
         });
 
         if (this.ownerDocument().osu.isRankedMapper) 
-            await discordMember.roles.add(config.discord.roles.rankedMapper);
+            addArray.push(config.discord.roles.rankedMapper);
         else
-            await discordMember.roles.remove(config.discord.roles.rankedMapper);
+            removeArray.push(config.discord.roles.rankedMapper);
 
-        await discordMember.roles.add(config.discord.roles.verifiedRole);
+        addArray.push(config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
+            await discordMember.roles.remove(removeArray);
+            await discordMember.roles.add(addArray);
+
             await discordMember.setNickname(this.ownerDocument().getUsername());
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
@@ -88,16 +94,18 @@ DiscordInformationSchema.methods.updateUser = async function() {
 DiscordInformationSchema.methods.delink = async function() {
     let discordMember = await DiscordClient.fetchMember(this.userId);
     if(discordMember) {
+
+        let removeArray = [config.discord.roles.verifiedRole, config.discord.roles.rankedMapper];
+
         Object.keys(config.discord.roles.groupRoles).forEach(async group => {
-            await discordMember.roles.remove(config.discord.roles.groupRoles[group]);
+            removeArray.push(config.discord.roles.groupRoles[group]);
         });
         Object.keys(config.discord.roles.playModeRoles).forEach(async playmode => {
-            await discordMember.roles.remove(config.discord.roles.playModeRoles[playmode]);
+            removeArray.push(config.discord.roles.playModeRoles[playmode]);
         });
-
-        await discordMember.roles.remove([config.discord.roles.verifiedRole, config.discord.roles.rankedMapper]);
     
         try{ //in case of permission error during updating
+            await discordMember.roles.remove(removeArray);
             await discordMember.setNickname("");
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
@@ -135,7 +143,8 @@ UserSchema.methods.getInfos = async function() {
         discordID: this.discord ? this.discord.userId : null,
         discordName: this.discord ? this.discord.userNameWithDiscriminator : null,
         osuLinked: this.osu != null,
-        discordLinked: this.discord != null
+        discordLinked: this.discord != null,
+        availableDelinkDate: this.discord != null && (Date.now() - this.discord.dateAdded.getTime()) < 86400000 ? this.discord.dateAdded.setDate(this.discord.dateAdded.getDate() + 1) : null
     }
 }
 

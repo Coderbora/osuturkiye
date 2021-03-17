@@ -6,6 +6,7 @@ const Logger = require("../../../../Logger.js");
 const DiscordClient = require("../../../../DiscordClient.js")();
 const config = require("../../../../../../config.json");
 const { isDatabaseAvailable, isAuthenticated } = require("../../../../middlewares.js");
+const ErrorCode = require("../../../../models/ErrorCodes.js");
 
 
 let logger = Logger.get("AuthDiscordRouter");
@@ -30,24 +31,27 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
         }
     }
 
-    await Promise.all([
-        req.user.osu.fetchUser(),
-        req.user.discord.updateUser()
-    ])
+    await req.user.osu.fetchUser();
+    await req.user.discord.updateUser();
     
     res.redirect("/");
 });
 
 router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req, res) => {
-    const osuID = req.user.osu.userId;
-    const discordID = req.user.discord.userId;
+    if(Date.now() - req.user.discord.dateAdded.getTime() > 86400000) { 
+        const osuID = req.user.osu.userId;
+        const discordID = req.user.discord.userId;
+    
 
-    await req.user.discord.delink();
-    req.user.discord = null;
-    await req.user.save();
+        await req.user.discord.delink();
+        req.user.discord = null;
+        await req.user.save();
 
-    logger.info(`**${req.user.getUsername()}** \`osu ID: ${osuID}\` \`Discord ID: ${discordID}\` has delinked their Discord account.`);
-    return res.json({ error: false });
+        logger.info(`**${req.user.getUsername()}** \`osu ID: ${osuID}\` \`Discord ID: ${discordID}\` has delinked their Discord account.`);
+        return res.json({ error: false });
+    } else {
+        throw ErrorCode.FORBIDDEN;
+    }
 })
 
 module.exports = router;

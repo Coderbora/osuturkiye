@@ -23,7 +23,7 @@ router.use("*", express.static("build/client/index.html"));
 
 router.use((err, req, res, next) => {
     if (err) {
-        if(err instanceof ErrorCode) {
+        if(err.custom) {
             if(req.api)
                 res.status(err.httpCode).json({error: err.name});
             else

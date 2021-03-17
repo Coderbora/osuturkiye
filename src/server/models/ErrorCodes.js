@@ -14,7 +14,7 @@ module.exports = class ErrorCode {
 
     constructor(name, httpCode, logout) {
         return {
-            name, httpCode, logout
+            name, httpCode, logout, custom: true
         }
     }
 }
