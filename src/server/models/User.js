@@ -94,16 +94,18 @@ DiscordInformationSchema.methods.updateUser = async function() {
 DiscordInformationSchema.methods.delink = async function() {
     let discordMember = await DiscordClient.fetchMember(this.userId);
     if(discordMember) {
+
+        let removeArray = [config.discord.roles.verifiedRole, config.discord.roles.rankedMapper];
+
         Object.keys(config.discord.roles.groupRoles).forEach(async group => {
-            await discordMember.roles.remove(config.discord.roles.groupRoles[group]);
+            removeArray.push(config.discord.roles.groupRoles[group]);
         });
         Object.keys(config.discord.roles.playModeRoles).forEach(async playmode => {
-            await discordMember.roles.remove(config.discord.roles.playModeRoles[playmode]);
+            removeArray.push(config.discord.roles.playModeRoles[playmode]);
         });
-
-        await discordMember.roles.remove([config.discord.roles.verifiedRole, config.discord.roles.rankedMapper]);
     
         try{ //in case of permission error during updating
+            await discordMember.roles.remove(removeArray);
             await discordMember.setNickname("");
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
