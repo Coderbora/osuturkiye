@@ -2,8 +2,19 @@ const express = require("express");
 const router = require("express-promise-router")();
 const apiRouter = require("./api/index.js");
 const ErrorCode = require("../models/ErrorCodes.js");
+const config = require("../../../config.json");
 
 const Logger = require("../Logger.js");
+
+// https re-write function
+if(config.https.enable) {
+    router.use((req, res, next) => {
+        if (!req.secure)
+            res.redirect('https://' + req.headers.host + req.url);
+        else
+            return next();
+    });
+}
 
 router.use("/api", apiRouter);
 
