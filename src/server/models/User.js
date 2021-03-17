@@ -53,7 +53,7 @@ DiscordInformationSchema.methods.updateUser = async function() {
     let discordMember = await DiscordClient.fetchMember(this.userId);
     if(discordMember) {
 
-        let addArray, removeArray = [];
+        let addArray = [], removeArray = [];
 
         Object.keys(config.discord.roles.groupRoles).forEach(async group => {
             if(this.ownerDocument().osu.groups.includes(group))
