@@ -9,7 +9,10 @@ class DiscordTransport extends Transport {
         super(opts)
     }
     log(info, callback) {
-        DiscordClient.log(info);
+        
+        if(process.env.NODE_ENV !== "development")
+            DiscordClient.log(info);
+        
         callback();
     }
 }
