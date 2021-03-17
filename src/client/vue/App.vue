@@ -7,24 +7,32 @@
             </div>
             <p>osu! hesabınız ile Discord hesabınızı bağlayın!</p>
             <div class="actionbar">
-                <button @click="osuAction()">
-                    <template v-if="!user.osuLinked">
-                        <i id="osu" class="fas fa-circle"></i> osu!
-                    </template>
-                    <template v-else>
-                        <i id="osu" class="fa fa-check"></i> {{ user.username }}
-                    </template>
-                </button>
+                <div class="actionBtn">
+                    <button @click="osuAction()">
+                        <template v-if="!user.osuLinked">
+                            <i id="osu" class="fas fa-circle"></i> osu!
+                        </template>
+                        <template v-else>
+                            <i id="osu" class="fa fa-check"></i> {{ user.username }}
+                        </template>
+                    </button>
+                    <p class="alt" v-if="!user.osuLinked">LOG IN</p>
+                    <p class="alt" v-else>LOG OUT</p>
+                </div>
                 <i class="between fas fa-plus"></i>
-                <button :disabled="!user.osuLinked && !user.discordLinked" @click="discordAction()">
-                    <template v-if="!user.discordLinked">
-                        <i id="discord" class="fab fa-discord"></i> Discord
-                    </template>
-                    <template v-else>
-                        <i id="discord" class="fa fa-check"></i> {{ user.discordName }}
-                    </template>
-                    
-                </button>
+                <div class="actionBtn">
+                    <button :disabled="(!user.osuLinked && !user.discordLinked) || (user.discordLinked && user.availableDelinkDate != null)" @click="discordAction()">
+                        <template v-if="!user.discordLinked">
+                            <i id="discord" class="fab fa-discord"></i> Discord
+                        </template>
+                        <template v-else>
+                            <i id="discord" class="fa fa-check"></i> {{ user.discordName }}
+                        </template>
+                    </button>
+                    <p class="alt" v-if="!user.discordLinked">LINK</p>
+                    <p class="alt" v-if="user.discordLinked && !user.deadlineDate">DELINK</p>
+                    <p class="alt" v-if="user.deadlineDate"><Timer :deadline="user.deadlineDate.toISOString()"></Timer></p>
+                </div>
             </div>
         </div>
     </div>
@@ -33,16 +41,23 @@
 import axios from "axios";
 import regeneratorRuntime from "regenerator-runtime";
 
+import Timer from "./components/Timer";
+
 export default {
     name: "App",
+    components: {
+        Timer
+    },
     data: () => { return {
         user: {
             osuLinked: false,
-            discordLinked: false
+            discordLinked: false,
+            deadlineDate: null
         },
         defaultUser: {
             osuLinked: false,
-            discordLinked: false
+            discordLinked: false,
+            deadlineDate: null
         }
     }},
     methods: {
@@ -51,6 +66,8 @@ export default {
                 let data = res.data.user;
                 if(data) {
                     this.user = data;
+                    if(data.availableDelinkDate)
+                        this.user.deadlineDate = new Date(data.availableDelinkDate);
                 } else {
                     this.user = this.defaultUser;
                 }
@@ -91,10 +108,12 @@ export default {
                 this.loadingAnimation("discord");
                 window.location.href = "/api/auth/discord"
             } else {
-                this.loadingAnimation("discord");
-                await axios.get("/api/auth/discord/delink");
-                this.reloadData();
-                this.loadingAnimation("discord");
+                if(!this.user.availableDelinkDate) {
+                    this.loadingAnimation("discord");
+                    await axios.get("/api/auth/discord/delink");
+                    this.reloadData();
+                    this.loadingAnimation("discord");
+                }
             }
         }
     },
@@ -141,6 +160,16 @@ span {
 
 .between {
     margin: 0px 15px;
+}
+
+.actionBtn {
+    display: inline-grid;
+}
+
+.alt {
+    font-size: 8pt;
+    font-weight: bold;
+    color: #ccc;
 }
 
 button {

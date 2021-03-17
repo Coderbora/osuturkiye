@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
 })
 
 OsuInformationSchema.methods.fetchUser = async function() {
-    if(Date.now() - this.lastVerified > 86400) { // expires after one day
+    if(Date.now() - this.lastVerified.getTime() > 86400000) { // expires after one day
         const tokenRet = await osuApi.refreshAccessToken(this.refreshToken);
         this.accessToken = tokenRet.access_token;
         this.refreshToken = tokenRet.refresh_token;
@@ -143,7 +143,8 @@ UserSchema.methods.getInfos = async function() {
         discordID: this.discord ? this.discord.userId : null,
         discordName: this.discord ? this.discord.userNameWithDiscriminator : null,
         osuLinked: this.osu != null,
-        discordLinked: this.discord != null
+        discordLinked: this.discord != null,
+        availableDelinkDate: this.discord != null && (Date.now() - this.discord.dateAdded.getTime()) < 86400000 ? this.discord.dateAdded.setDate(this.discord.dateAdded.getDate() + 1) : null
     }
 }
 
