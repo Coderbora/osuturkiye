@@ -16,7 +16,14 @@ router.get("/", isDatabaseAvailable, isAuthenticated, passport.authenticate("dis
 
 router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { failureRedirect: "/" }) , async (req, res) => {
     
-    let discordMember = await DiscordClient.fetchMember(req.user.discord.userId);
+    let discordMember;
+    
+    try {
+        discordMember = await DiscordClient.fetchMember(req.user.discord.userId);
+    } catch {
+        discordMember = null;
+    }
+    
     
     if (!discordMember) {
         try {
