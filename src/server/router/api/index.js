@@ -64,11 +64,12 @@ passport.use("osu", new OsuStrategy({
     try {
         let user = await User.findOne({ "osu.userId": profile.id });
         if(user)
-            user.lastLogin = user.osu.lastVerified = new Date();
+            user.lastLogin = new Date();
         else
             user = new User({
                 osu: {
-                    userId: profile.id
+                    userId: profile.id,
+                    lastVerified: new Date()
                 },
             });
 
