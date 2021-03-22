@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ErrorCode } = require('./models/ErrorCodes.js');
+const ErrorCode = require('./models/ErrorCodes.js');
 
 const isAuthenticated = (req, res, next) => {
     if(!req.user)
