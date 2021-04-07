@@ -48,7 +48,7 @@ class DiscordClient {
         try {
             discordMember = await this.discordGuild.members.fetch(id);
         } catch(err) {
-            if(!(err instanceof DiscordAPIError && err.code === 10007))
+            if(!(err instanceof DiscordAPIError && (err.code === 10007 || err.code === 10013)))
                 throw err;
         }
 
