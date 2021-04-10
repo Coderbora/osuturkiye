@@ -42,11 +42,14 @@ class DiscordClient {
         }
     }
 
-    async fetchMember(id) {
+    async fetchMember(id, ignoreCache = false) {
         let discordMember = null;
 
         try {
-            discordMember = await this.discordGuild.members.fetch(id);
+            discordMember = await this.discordGuild.members.fetch({
+                user: id,
+                force: ignoreCache
+            });
         } catch(err) {
             if(!(err instanceof DiscordAPIError && (err.code === 10007 || err.code === 10013)))
                 throw err;

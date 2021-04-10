@@ -50,7 +50,7 @@ OsuInformationSchema.methods.fetchUser = async function() {
 };
 
 DiscordInformationSchema.methods.updateUser = async function() {
-    let discordMember = await DiscordClient.fetchMember(this.userId);
+    let discordMember = await DiscordClient.fetchMember(this.userId, true);
     if(discordMember) {
 
         let addArray = [], removeArray = [];
@@ -92,7 +92,7 @@ DiscordInformationSchema.methods.updateUser = async function() {
 };
 
 DiscordInformationSchema.methods.delink = async function() {
-    let discordMember = await DiscordClient.fetchMember(this.userId);
+    let discordMember = await DiscordClient.fetchMember(this.userId, true);
     if(discordMember) {
 
         let removeArray = [config.discord.roles.verifiedRole, config.discord.roles.rankedMapper];
