@@ -1,16 +1,15 @@
-const mongoose = require('mongoose');
-const DiscordClient = require("../DiscordClient.js")();
-const { User } = require("../models/User.js");
+import mongoose from 'mongoose';
+import { Logger } from '../Logger';
+import { App } from '../App';
+import { User } from "../models/User";
 
-const Logger = require("../Logger.js");
-
-module.exports = class RefreshAllUserData {
+export default class RefreshAllUserData {
     logger = Logger.get("scripts/RefreshAllUserData");
 
     CONCURRENCY = 20;
 
     async run() {
-        if(mongoose.connection.readyState !== 0 && DiscordClient.discordClient.ws.status === 0) {
+        if(mongoose.connection.readyState !== 0 && App.instance.discordClient.discordClient.ws.status === 0) {
             this.logger.info("Fetching users!");
             const users = await User.find({ discord: { $exists: true } });
             this.logger.info(`Found ${ users.length } users to refresh!`);

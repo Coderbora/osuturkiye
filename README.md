@@ -10,12 +10,15 @@ This project is still under development in sub-branches, if you want to contribu
 Firstly, you need to install dependencies with `npm install` command.
 
 ### Creating config file
-Then, you need to copy the `config.example.json` for your actual-use config file: `config.json`
+Then, you need to copy the `config.defaults.json` for your actual-use config file: `config.json`
 
 With this action, you can edit values about the project. 
 
 ### Building front-end
-You can build the front-end with `npm run build` command.
+You can build the front-end with `npm run build:client` command.
+
+### Building server
+You can build the server with `npm run build:server` command.
 
 ### Running the project
 After creating config file and building the front-end, you are ready to run the project with `npm run start`

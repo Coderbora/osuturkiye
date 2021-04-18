@@ -1,4 +1,4 @@
-module.exports = class ErrorCode {
+export class ErrorCode {
     static ALREADY_AUTHENTICATED = new ErrorCode("ALREADY_AUTHENTICATED", 400, false);
     static MISSING_PARAMETERS = new ErrorCode("MISSING_PARAMETERS", 400, false);
     static INVALID_PARAMETERS = new ErrorCode("INVALID_PARAMETERS", 400, false);

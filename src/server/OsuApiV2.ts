@@ -1,33 +1,39 @@
-const axios = require('axios');
-const { ClientCredentials } = require('simple-oauth2');
+import axios from 'axios';
+import { ClientCredentials } from 'simple-oauth2';
 
-const config = require('../../config.json');
+import { App } from './App';
 
-let mInstance = null;
-
-class osuApiV2 {
+export class osuApiV2 {
+    private options: {
+        client: {
+            id: string;
+            secret: string;
+        },
+        auth: {
+            tokenHost: string;
+        }
+    };
 
     constructor() {
         this.options = {
             client: {
-                id: config.osu.clientId,
-                secret: config.osu.clientSecret,
+                id: App.instance.config.osu.clientId,
+                secret: App.instance.config.osu.clientSecret,
             },
             auth: {
                 tokenHost: "https://osu.ppy.sh",
             },
         };
-        this.clientCredentials = new ClientCredentials(this.options);
     }
   
-    async fetchUser(user, accessToken, gameMode) {
+    static async fetchUser(user, accessToken, gameMode) {
         return await this.request({
             endpoint: `${user ? `/users/${user}` : "/me"}${gameMode ? `/${gameMode}` : ""}`,
             accessToken,
         });
     }
   
-    async request({endpoint, accessToken}) {
+    static async request({endpoint, accessToken}) {
         return (await axios(endpoint, {
             baseURL: "https://osu.ppy.sh/api/v2",
             headers: {
@@ -36,22 +42,16 @@ class osuApiV2 {
         })).data;
     }
 
-    async refreshAccessToken(refresh_token) {
+    static async refreshAccessToken(refresh_token) {
         return (await axios({
             method: 'post',
             url: "https://osu.ppy.sh/oauth/token",
             data: {
                 grant_type: 'refresh_token',
                 refresh_token,
-                client_id: config.osu.clientId,
-                client_secret: config.osu.clientSecret,
+                client_id: App.instance.config.osu.clientId,
+                client_secret: App.instance.config.osu.clientSecret,
             }
         })).data;
     }
-}
-
-module.exports = () => {
-    if(mInstance == null)
-        mInstance = new osuApiV2();
-    return mInstance;
 }

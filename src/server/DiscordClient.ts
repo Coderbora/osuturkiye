@@ -1,14 +1,12 @@
-const discord = require('discord.js');
-const Logger = require('./Logger.js');
-const config = require('../../config.json');
-const { DiscordAPIError } = require("discord.js");
+import discord from 'discord.js';
+import { Logger } from './Logger.js';
+import { App } from './App';
+import { DiscordAPIError } from "discord.js";
 
-let mInstance = null;
+export class DiscordClient { 
 
-class DiscordClient { 
-
-    static discordClient = null;
-    logChannel = null;
+    discordClient: discord.Client;
+    logChannel: discord.TextChannel;
 
     constructor() {
         this.discordClient = new discord.Client()
@@ -23,20 +21,20 @@ class DiscordClient {
     }
 
     get discordGuild() {
-        return this.discordClient.guilds.resolve(config.discord.guildID);
+        return this.discordClient.guilds.resolve(App.instance.config.discord.guildID);
     }
 
     async log(info) {
-        if(config.level_colors.hasOwnProperty(info.level)) {
+        if(App.instance.config.level_colors.hasOwnProperty(info.level)) {
             if(!this.logChannel)
-                this.logChannel = await this.discordClient.channels.fetch(config.discord.logChannel);
+                this.logChannel = await this.discordClient.channels.fetch(App.instance.config.discord.logChannel) as discord.TextChannel;
 
             await this.logChannel.send({
                 embed: {
                     title: info.label ? info.label : "",
                     description: info.message,
                     timestamp: info.timestamp,
-                    color: config.level_colors[info.level]
+                    color: App.instance.config.level_colors[info.level]
                 }
             })
         }
@@ -58,9 +56,3 @@ class DiscordClient {
         return discordMember;
     }
 }
-
-module.exports = () => {
-    if(mInstance == null)
-        mInstance = new DiscordClient();
-    return mInstance;
-  }

@@ -1,12 +1,10 @@
-const { CronJob } = require("cron");
-const Logger = require("./Logger.js");
-const RefreshAllUserData = require("./scripts/RefreshAllUserData.js")
+import { CronJob } from "cron";
+import { Logger } from "./Logger";
+import RefreshAllUserData from "./scripts/RefreshAllUserData";
 
-let mInstance = null;
+export class Cron {
 
-class Cron {
-
-    tasks = [];
+    tasks: Array<CronJob> = [];
 
     logger = Logger.get("cron")
 
@@ -30,9 +28,3 @@ class Cron {
     }
 
 }
-
-module.exports = () => {
-    if(mInstance == null)
-        mInstance = new Cron();
-    return mInstance;
-  }

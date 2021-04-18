@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"outDir": "./build/server",
+		"rootDir": "./src/server",
+		"sourceMap": true,
+		"target": "es2015",
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"lib": [
+			"es2017"
+		],
+		"esModuleInterop": true,
+		"skipLibCheck": true
+	},
+	"files": [
+		"src/server/index.ts"
+	],
+	"include": [
+		"src/server/scripts/*.ts"
+	],
+  "exclude": ["node_modules", "data", "dist", "build", ".cache", ".github"]
+}
