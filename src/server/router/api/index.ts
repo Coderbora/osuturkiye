@@ -7,7 +7,7 @@ import DiscordStrategy from "passport-discord";
 import OsuStrategy from 'passport-osu';
 
 import { Logger } from "../../Logger";
-import { User } from "../../models/User";
+import { User, IDiscordIntegration } from "../../models/User";
 import { ErrorCode } from "../../models/ErrorCodes";
 import { IAppRequest } from "../../models/IAppRequest";
 
@@ -47,6 +47,7 @@ export class ApiRouter {
             if(req.user) {
                 try {
                     if(!req.user.discord) {
+                        req.user.discord = {} as IDiscordIntegration;
                         req.user.discord.userId = profile.id;
                     }
                         
