@@ -41,14 +41,19 @@ passport.use('discord', new DiscordStrategy({
 }, async (req, accessToken, refreshToken, profile, done) => {
     if(req.user) {
         try {
-            if(!req.user.discord) 
+            if(!req.user.discord) {
                 req.user.discord = { userId: profile.id };
-
-            req.user.discord.userNameWithDiscriminator = `${profile.username}#${profile.discriminator}`;
-            req.user.discord.accessToken = accessToken;
-            req.user.discord.refreshToken = refreshToken;
-            await req.user.save();
-            done(null, req.user);
+            }
+            if(req.user.discord.userId !== profile.id) {
+                passportLogger.warn(`User \`${req.user.osu.username}\` tried to reclaim another Discord account (ID: \`${profile.id}\`, Name: \`${profile.username}#${profile.discriminator}\`)`)
+                done(ErrorCode.ALREADY_AUTHENTICATED);
+            } else {
+                req.user.discord.userNameWithDiscriminator = `${profile.username}#${profile.discriminator}`;
+                req.user.discord.accessToken = accessToken;
+                req.user.discord.refreshToken = refreshToken;
+                await req.user.save();
+                done(null, req.user);
+            }
         } catch(error) {
             passportLogger.error("Error while authenticating user via Discord", { error });
             done(error);

@@ -9,7 +9,6 @@ class DiscordTransport extends Transport {
         super(opts)
     }
     log(info, callback) {
-        
         if(process.env.NODE_ENV !== "development")
             DiscordClient.log(info);
         
@@ -19,7 +18,7 @@ class DiscordTransport extends Transport {
 
 module.exports = class Logger {
     static transports = [
-        new winston.transports.Console({ level: "silly", format: winston.format.simple() }),
+        new winston.transports.Console({ level: "unprioritized", format: winston.format.simple() }),
         new winstonDailyRotateFile({
             dirname: "data/logs/",
             filename: "%DATE%.log",
@@ -36,6 +35,13 @@ module.exports = class Logger {
                 winston.format.json(),
             ),
             transports: Logger.transports,
+            levels: {
+                error: 0,
+                warn: 1,
+                success: 2,
+                info: 3,
+                unprioritized: 4
+            }
         });
     }
 
