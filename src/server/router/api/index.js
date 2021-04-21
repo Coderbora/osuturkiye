@@ -1,7 +1,7 @@
 const router = require("express-promise-router")();
 const session = require("express-session");
 const passport = require("passport");
-const MongoStore  = require("connect-mongo").default;
+const MongoStore  = require("connect-mongo");
 
 const DiscordStrategy = require("passport-discord").Strategy;
 const OsuStrategy = require('passport-osu').default;

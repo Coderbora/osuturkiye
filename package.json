@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "connect-mongo": "^4.2.2",
+    "connect-mongo": "^4.4.1",
     "cron": "^1.8.2",
     "discord.js": "^12.5.1",
     "express": "^4.17.1",
