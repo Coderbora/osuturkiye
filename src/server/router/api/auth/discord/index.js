@@ -33,7 +33,7 @@ router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authentic
 
     await req.user.osu.fetchUser();
     await req.user.discord.updateUser();
-    logger.log("success",`**${req.user.getUsername()}** \`osu ID: ${req.user.osu.userId}\` \`Discord ID: ${req.user.discord.userId}\` has **linked** their Discord account.`);
+    logger.log("success",`**[${req.user.getUsername()}](https://osu.ppy.sh/users/${req.user.osu.userId})** \`Discord ID: ${req.user.discord.userId}\` has **linked** their Discord account.`);
     res.redirect("/");
 });
 
@@ -47,7 +47,7 @@ router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req, res) => 
         req.user.discord = undefined;
         await req.user.save();
 
-        logger.log("error", `**${req.user.getUsername()}** \`osu ID: ${osuID}\` \`Discord ID: ${discordID}\` has **delinked** their Discord account.`);
+        logger.log("error", `**[${req.user.getUsername()}](https://osu.ppy.sh/users/${req.user.osu.userId})** \`Discord ID: ${discordID}\` has **delinked** their Discord account.`);
         return res.json({ error: false });
     } else {
         throw ErrorCode.FORBIDDEN;

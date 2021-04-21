@@ -45,7 +45,7 @@ passport.use('discord', new DiscordStrategy({
                 req.user.discord = { userId: profile.id };
             }
             if(req.user.discord.userId !== profile.id) {
-                passportLogger.warn(`User \`${req.user.osu.username}\` tried to reclaim another Discord account (ID: \`${profile.id}\`, Name: \`${profile.username}#${profile.discriminator}\`)`)
+                passportLogger.warn(`User **[${req.user.getUsername()}](https://osu.ppy.sh/users/${req.user.osu.userId})** tried to reclaim another Discord account (ID: \`${profile.id}\`, Name: \`${profile.username}#${profile.discriminator}\`)`)
                 done(ErrorCode.ALREADY_AUTHENTICATED);
             } else {
                 req.user.discord.userNameWithDiscriminator = `${profile.username}#${profile.discriminator}`;
