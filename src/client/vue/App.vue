@@ -37,11 +37,25 @@
         </div>
     </div>
 </template>
-<script>
+<script lang="ts">
 import axios from "axios";
-import regeneratorRuntime from "regenerator-runtime";
 
-import Timer from "./components/Timer";
+import Timer from "./components/Timer.vue";
+import { User } from 'discord.js';
+
+interface UserDetails {
+    id: String,
+    lastLogin: Date,
+    avatar_url: String,
+    osuID?: Number,
+    username?: String,
+    discordID?: String,
+    discordName?: String,
+    osuLinked: Boolean,
+    availableDelinkDate: Number | null,
+    discordLinked: Boolean,
+    deadlineDate: Date
+}
 
 export default {
     name: "App",
@@ -49,11 +63,7 @@ export default {
         Timer
     },
     data: () => { return {
-        user: {
-            osuLinked: false,
-            discordLinked: false,
-            deadlineDate: null
-        },
+        user: <UserDetails>{},
         defaultUser: {
             osuLinked: false,
             discordLinked: false,
