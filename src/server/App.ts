@@ -25,23 +25,25 @@ export class App {
     public logger = Logger.get();
     public config = new Config();
     public httpServer: http.Server;
-    public httpsServer: https.Server;
+    public httpsServer?: https.Server;
     public credentials = {};
 
     constructor() {
-
-    }
-
-    async start() {
-        this.app.use(express.static(path.join(__dirname, "static"), { dotfiles: 'allow' }));
-        this.app.use("/", (new MainRouter()).router);
+        this.httpServer = http.createServer(this.app);
 
         if (this.config.https.enable) {
             this.credentials = {
                 key: fs.readFileSync(this.config.https.privateKeyPath, 'utf8'),
                 cert: fs.readFileSync(this.config.https.certificatePath, 'utf8')
             }
+
+            this.httpsServer = https.createServer(this.credentials, this.app);
         }
+    }
+
+    async start() {
+        this.app.use(express.static(path.join(__dirname, "static"), { dotfiles: 'allow' }));
+        this.app.use("/", (new MainRouter()).router);
 
         mongoose.connect(this.config.mongo.uri, { autoIndex: false, useNewUrlParser: true });
 
@@ -50,17 +52,13 @@ export class App {
         this.cron.init();
 
         return new Promise<void>(async (resolve, reject) => {
-            this.httpServer = http.createServer(this.app);
             this.httpServer.listen(this.config.http.port, this.config.http.host, () => {
                 this.logger.info(`Listening HTTP requests on ${this.config.http.publicUrl} !`);
             });
 
-            if (this.config.https.enable) {
-                this.httpsServer = https.createServer(this.credentials, this.app);
-                this.httpsServer.listen(this.config.https.port, this.config.https.host, () => {
-                    this.logger.info(`Listening HTTPS requests on ${this.config.https.publicUrl} !`);
-                });
-            }
+            this.httpsServer?.listen(this.config.https.port, this.config.https.host, () => {
+                this.logger.info(`Listening HTTPS requests on ${this.config.https.publicUrl} !`);
+            });
 
             resolve();
         }); 
@@ -78,14 +76,12 @@ export class App {
                 }
             });
 
-            if(this.config.https.enable) {
-                this.httpsServer.close((error) => {
-                    if(error) {
-                        this.logger.error("Error while closing the https server!", { error });
-                        return reject(error);
-                    }
-                });    
-            }
+            this.httpsServer?.close((error) => {
+                if(error) {
+                    this.logger.error("Error while closing the https server!", { error });
+                    return reject(error);
+                }
+            });    
 
             this.logger.info("Stopped the app!");
             resolve();

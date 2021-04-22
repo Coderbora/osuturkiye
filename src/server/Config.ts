@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as _ from "lodash";
-import { Logger } from "./Logger";
 
 export class Config {
     public http = {

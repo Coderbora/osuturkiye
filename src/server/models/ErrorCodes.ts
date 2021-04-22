@@ -12,7 +12,7 @@ export class ErrorCode {
 
     static TEMPORARILY_UNAVAILABLE = new ErrorCode("TEMPORARILY_UNAVAILABLE", 503, false);
 
-    constructor(name, httpCode, logout) {
+    constructor(name: string, httpCode: number, logout: boolean) {
         return {
             name, httpCode, logout, custom: true
         }

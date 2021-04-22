@@ -2,17 +2,18 @@ import discord from 'discord.js';
 import { Logger } from './Logger.js';
 import { App } from './App';
 import { DiscordAPIError } from "discord.js";
+import { LogEntry } from "winston";
 
 export class DiscordClient { 
 
     discordClient: discord.Client;
-    logChannel: discord.TextChannel;
+    logChannel!: discord.TextChannel;
 
     constructor() {
         this.discordClient = new discord.Client()
     }
 
-    async start(token) {
+    async start(token: string) {
         await this.discordClient.login(token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
     }
 
@@ -24,7 +25,7 @@ export class DiscordClient {
         return this.discordClient.guilds.resolve(App.instance.config.discord.guildID);
     }
 
-    async log(info) {
+    async log(info: LogEntry) {
         if(App.instance.config.level_colors.hasOwnProperty(info.level)) {
             if(!this.logChannel)
                 this.logChannel = await this.discordClient.channels.fetch(App.instance.config.discord.logChannel) as discord.TextChannel;
@@ -40,11 +41,11 @@ export class DiscordClient {
         }
     }
 
-    async fetchMember(id, ignoreCache = false) {
+    async fetchMember(id: string, ignoreCache = false) {
         let discordMember = null;
 
         try {
-            discordMember = await this.discordGuild.members.fetch({
+            discordMember = await this.discordGuild?.members.fetch({
                 user: id,
                 force: ignoreCache
             });

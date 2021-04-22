@@ -1,39 +1,16 @@
 import axios from 'axios';
-import { ClientCredentials } from 'simple-oauth2';
-
 import { App } from './App';
 
 export class osuApiV2 {
-    private options: {
-        client: {
-            id: string;
-            secret: string;
-        },
-        auth: {
-            tokenHost: string;
-        }
-    };
 
-    constructor() {
-        this.options = {
-            client: {
-                id: App.instance.config.osu.clientId,
-                secret: App.instance.config.osu.clientSecret,
-            },
-            auth: {
-                tokenHost: "https://osu.ppy.sh",
-            },
-        };
-    }
-  
-    static async fetchUser(user, accessToken, gameMode) {
+    static async fetchUser(user?: string, accessToken?: string, gameMode?: string) {
         return await this.request({
             endpoint: `${user ? `/users/${user}` : "/me"}${gameMode ? `/${gameMode}` : ""}`,
             accessToken,
         });
     }
   
-    static async request({endpoint, accessToken}) {
+    static async request({endpoint, accessToken}: { endpoint: string; accessToken?: string }) {
         return (await axios(endpoint, {
             baseURL: "https://osu.ppy.sh/api/v2",
             headers: {
@@ -42,7 +19,7 @@ export class osuApiV2 {
         })).data;
     }
 
-    static async refreshAccessToken(refresh_token) {
+    static async refreshAccessToken(refresh_token: string) {
         return (await axios({
             method: 'post',
             url: "https://osu.ppy.sh/oauth/token",

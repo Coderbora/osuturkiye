@@ -7,7 +7,7 @@ import DiscordStrategy from "passport-discord";
 import OsuStrategy from 'passport-osu';
 
 import { Logger } from "../../Logger";
-import { User, IDiscordIntegration } from "../../models/User";
+import { User, IDiscordInformation } from "../../models/User";
 import { ErrorCode } from "../../models/ErrorCodes";
 import { IAppRequest } from "../../models/IAppRequest";
 
@@ -47,7 +47,7 @@ export class ApiRouter {
             if(req.user) {
                 try {
                     if(!req.user.discord) {
-                        req.user.discord = {} as IDiscordIntegration;
+                        req.user.discord = {} as IDiscordInformation;
                         req.user.discord.userId = profile.id;
                     }
                         
@@ -81,11 +81,11 @@ export class ApiRouter {
                         },
                     });
         
-                user.osu.playmode = profile._json.playmode;
-                user.osu.username = profile._json.username;
+                user.osu!.playmode = profile._json.playmode;
+                user.osu!.username = profile._json.username;
         
-                user.osu.accessToken = accessToken;
-                user.osu.refreshToken = refreshToken;
+                user.osu!.accessToken = accessToken;
+                user.osu!.refreshToken = refreshToken;
                 await user.save();
                 done(null, user);
             } catch(error) {

@@ -1,14 +1,15 @@
 import winston from 'winston';
 import winstonDailyRotateFile from 'winston-daily-rotate-file';
 import Transport from 'winston-transport';
+import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
 import { App } from './App';
 
 class DiscordTransport extends Transport {
-    constructor(opts) {
+    constructor(opts?: ConsoleTransportOptions) {
         super(opts)
     }
-    log(info, callback) {
+    log(info: any, callback: () => void) {
         
         if(process.env.NODE_ENV !== "development")
             App.instance.discordClient.log(info);
@@ -25,7 +26,7 @@ export abstract class Logger {
             filename: "%DATE%.log",
             level: "info",
         }),
-        new DiscordTransport({})
+        new DiscordTransport()
     ];
 
     static get(label?: string) {

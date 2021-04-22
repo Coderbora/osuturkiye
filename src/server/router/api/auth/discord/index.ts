@@ -19,13 +19,13 @@ export class DiscordAuthRouter {
 
         this.router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { failureRedirect: "/" }) , async (req: IAppRequest, res) => {
             
-            let discordMember = await App.instance.discordClient.fetchMember(req.user.discord.userId, true);
+            let discordMember = await App.instance.discordClient.fetchMember(req.user!.discord!.userId, true);
             
             if (!discordMember) {
                 try {
-                    await App.instance.discordClient.discordGuild.addMember(req.user.discord.userId, {
-                        accessToken: req.user.discord.accessToken,
-                        nick: req.user.osu.username,
+                    await App.instance.discordClient.discordGuild?.addMember(req.user!.discord!.userId, {
+                        accessToken: req.user!.discord!.accessToken,
+                        nick: req.user!.osu!.username,
                         roles: [App.instance.config.discord.roles.verifiedRole]
                     });
                 } catch(err) {
@@ -34,23 +34,23 @@ export class DiscordAuthRouter {
                 }
             }
 
-            await req.user.osu.fetchUser();
-            await req.user.discord.updateUser();
+            await req.user!.osu!.fetchUser();
+            await req.user!.discord!.updateUser();
             
             res.redirect("/");
         });
 
         this.router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req: IAppRequest, res) => {
-            if(Date.now() - req.user.discord.dateAdded.getTime() > 86400000) { 
-                const osuID = req.user.osu.userId;
-                const discordID = req.user.discord.userId;
+            if(req.user!.discord && Date.now() - req.user!.discord.dateAdded.getTime() > 86400000) { 
+                const osuID = req.user!.osu!.userId;
+                const discordID = req.user!.discord?.userId;
             
 
-                await req.user.discord.delink();
-                req.user.discord = undefined;
-                await req.user.save();
+                await req.user!.discord?.delink();
+                req.user!.discord = undefined;
+                await req.user!.save();
 
-                logger.info(`**${req.user.getUsername()}** \`osu ID: ${osuID}\` \`Discord ID: ${discordID}\` has delinked their Discord account.`);
+                logger.info(`**${req.user!.getUsername()}** \`osu ID: ${osuID}\` \`Discord ID: ${discordID}\` has delinked their Discord account.`);
                 return res.json({ error: false });
             } else {
                 throw ErrorCode.FORBIDDEN;
