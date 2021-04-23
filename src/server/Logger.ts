@@ -9,8 +9,8 @@ class DiscordTransport extends Transport {
     constructor(opts?: ConsoleTransportOptions) {
         super(opts)
     }
+
     log(info, callback: () => void) {
-        
         if(process.env.NODE_ENV !== "development")
             App.instance.discordClient.log(info);
         
@@ -20,7 +20,7 @@ class DiscordTransport extends Transport {
 
 export abstract class Logger {
     static transports = [
-        new winston.transports.Console({ level: "silly", format: winston.format.simple() }),
+        new winston.transports.Console({ level: "unprioritized", format: winston.format.simple() }),
         new winstonDailyRotateFile({
             dirname: "data/logs/",
             filename: "%DATE%.log",
@@ -37,6 +37,13 @@ export abstract class Logger {
                 winston.format.json(),
             ),
             transports: Logger.transports,
+            levels: {
+                error: 0,
+                warn: 1,
+                success: 2,
+                info: 3,
+                unprioritized: 4
+            }
         });
     }
 
