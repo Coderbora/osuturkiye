@@ -1,4 +1,4 @@
-module.exports = class ErrorCode {
+export class ErrorCode {
     static ALREADY_AUTHENTICATED = new ErrorCode("ALREADY_AUTHENTICATED", 400, false);
     static MISSING_PARAMETERS = new ErrorCode("MISSING_PARAMETERS", 400, false);
     static INVALID_PARAMETERS = new ErrorCode("INVALID_PARAMETERS", 400, false);
@@ -12,7 +12,7 @@ module.exports = class ErrorCode {
 
     static TEMPORARILY_UNAVAILABLE = new ErrorCode("TEMPORARILY_UNAVAILABLE", 503, false);
 
-    constructor(name, httpCode, logout) {
+    constructor(name: string, httpCode: number, logout: boolean) {
         return {
             name, httpCode, logout, custom: true
         }

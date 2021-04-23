@@ -1,16 +1,14 @@
-const { CronJob } = require("cron");
-const Logger = require("./Logger.js");
-const RefreshAllUserData = require("./scripts/RefreshAllUserData.js")
+import { CronJob } from "cron";
+import { Logger } from "./Logger";
+import RefreshAllUserData from "./scripts/RefreshAllUserData";
 
-let mInstance = null;
+export class Cron {
 
-class Cron {
-
-    tasks = [];
+    tasks: Array<CronJob> = [];
 
     logger = Logger.get("cron")
 
-    init() {
+    init(): void {
         this.tasks.push(new CronJob("0 0 0 * * *" , async () => { // every day at midnight
             try {
                 this.logger.info("Executing daily user data refresh task!");
@@ -25,14 +23,8 @@ class Cron {
             task.start();
     }
 
-    stop() {
+    stop(): void {
         this.tasks.forEach((task) => task.stop());
     }
 
 }
-
-module.exports = () => {
-    if(mInstance == null)
-        mInstance = new Cron();
-    return mInstance;
-  }

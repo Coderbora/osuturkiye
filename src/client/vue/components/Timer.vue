@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="text-center" v-if="currentTime">
-        <span v-if="days">{{ days }}:</span><span v-if="hours">{{ hours | formatTime }}:</span><span>{{ minutes | formatTime }}:{{ seconds | formatTime }}</span>   
+        <span v-if="days">{{ days }}:</span><span v-if="hours">{{ formatTime(hours) }}:</span><span>{{ formatTime(minutes) }}:{{ formatTime(seconds) }}</span>   
      </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   props: {
     deadline: {
@@ -20,42 +20,40 @@ export default {
   },
   data() {
     return {
-      currentTime: Date.parse(this.deadline) - Date.parse(new Date())
+      currentTime: Date.parse(this.deadline) - Date.parse(new Date().toString())
     };
   },
-  mounted() {
+  mounted(): void {
     setTimeout(this.countdown, 1000);
   },
   computed: {
-    seconds() {
+    seconds(): number {
       return Math.floor((this.currentTime / 1000) % 60);
     },
-    minutes() {
+    minutes(): number {
       return Math.floor((this.currentTime / 1000 / 60) % 60);
     },
-    hours() {
+    hours(): number {
       return Math.floor((this.currentTime / (1000 * 60 * 60)) % 24);
     },
-    days() {
+    days(): number {
       return Math.floor(this.currentTime / (1000 * 60 * 60 * 24));
     }
   },
-  filters: {
-    formatTime(value) {
-      if (value < 10) {
-        return "0" + value;
-      }
-      return value;
-    }
-  },
   methods: {
-    countdown() {
-      this.currentTime = Date.parse(this.deadline) - Date.parse(new Date());
+    countdown(): void {
+      this.currentTime = Date.parse(this.deadline) - Date.parse(new Date().toString());
       if (this.currentTime > 0) {
         setTimeout(this.countdown, this.speed);
       } else {
         this.currentTime = null;
       }
+    },
+    formatTime(value: number): string {
+      if (value < 10) {
+        return "0" + value;
+      }
+      return value.toString();
     }
   }
 }

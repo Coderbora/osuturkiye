@@ -1,22 +1,24 @@
-const winston = require('winston');
-const winstonDailyRotateFile = require('winston-daily-rotate-file');
-const Transport = require('winston-transport');
+import winston from 'winston';
+import winstonDailyRotateFile from 'winston-daily-rotate-file';
+import Transport from 'winston-transport';
+import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
-const DiscordClient = require('./DiscordClient.js')();
+import { App } from './App';
 
 class DiscordTransport extends Transport {
-    constructor(opts) {
+    constructor(opts?: ConsoleTransportOptions) {
         super(opts)
     }
-    log(info, callback) {
+
+    log(info, callback: () => void) {
         if(process.env.NODE_ENV !== "development")
-            DiscordClient.log(info);
+            App.instance.discordClient.log(info);
         
         callback();
     }
 }
 
-module.exports = class Logger {
+export abstract class Logger {
     static transports = [
         new winston.transports.Console({ level: "unprioritized", format: winston.format.simple() }),
         new winstonDailyRotateFile({
@@ -27,7 +29,7 @@ module.exports = class Logger {
         new DiscordTransport()
     ];
 
-    static get(label) {
+    static get(label?: string): winston.Logger {
         return winston.createLogger({
             format: winston.format.combine(
                 winston.format.label({ label }),

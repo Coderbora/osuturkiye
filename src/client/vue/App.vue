@@ -37,23 +37,32 @@
         </div>
     </div>
 </template>
-<script>
+<script lang="ts">
 import axios from "axios";
-import regeneratorRuntime from "regenerator-runtime";
 
-import Timer from "./components/Timer";
+import Timer from "./components/Timer.vue";
+
+interface UserDetails {
+    id: string,
+    lastLogin: Date,
+    avatar_url: string,
+    osuID?: number,
+    username?: string,
+    discordID?: string,
+    discordName?: string,
+    osuLinked: boolean,
+    availableDelinkDate: number | null,
+    discordLinked: boolean,
+    deadlineDate: Date
+}
 
 export default {
     name: "App",
     components: {
         Timer
     },
-    data: () => { return {
-        user: {
-            osuLinked: false,
-            discordLinked: false,
-            deadlineDate: null
-        },
+    data() { return {
+        user: <UserDetails>{},
         defaultUser: {
             osuLinked: false,
             discordLinked: false,
@@ -61,19 +70,18 @@ export default {
         }
     }},
     methods: {
-        reloadData() {
-            axios.get("/api/user").then(res => {
-                let data = res.data.user;
-                if(data) {
-                    this.user = data;
-                    if(data.availableDelinkDate)
-                        this.user.deadlineDate = new Date(data.availableDelinkDate);
-                } else {
-                    this.user = this.defaultUser;
-                }
-            })
+        async reloadData(): Promise<void> {
+            let res = await axios.get("/api/user");
+            let data = res.data.user;
+            if(data) {
+                this.user = data;
+                if(data.availableDelinkDate)
+                    this.user.deadlineDate = new Date(data.availableDelinkDate);
+            } else {
+                this.user = this.defaultUser;
+            }
         },
-        loadingAnimation(button) {
+        loadingAnimation(button: "osu" | "discord"): void {
             let icon;
             switch (button) {
                 case "osu":
@@ -92,7 +100,7 @@ export default {
                     break;
             }
         },
-        async osuAction() {
+        async osuAction(): Promise<void> {
             if(!this.user.osuLinked) {
                 this.loadingAnimation("osu");
                 window.location.href = "/api/auth/osu"
@@ -103,7 +111,7 @@ export default {
                 this.loadingAnimation("osu");
             }
         },
-        async discordAction() {
+        async discordAction(): Promise<void> {
             if(!this.user.discordLinked) {
                 this.loadingAnimation("discord");
                 window.location.href = "/api/auth/discord"
@@ -117,7 +125,7 @@ export default {
             }
         }
     },
-    mounted() {
+    mounted(): void {
         this.reloadData();
     }
 }

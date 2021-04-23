@@ -1,13 +1,13 @@
 {
     "http": {
         "host": "",
-        "port": "",
+        "port": 5000,
         "publicUrl": ""
     },
     "https": {
         "enable": true,
         "host": "",
-        "port": "",
+        "port": 5443,
         "publicUrl": "",
 
         "privateKeyPath": "",
