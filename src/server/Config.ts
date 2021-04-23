@@ -62,11 +62,11 @@ export class Config {
         this.load();
     }
 
-    public load(configPath: string = "config.json") {
+    public load(configPath = "config.json"): void {
         this.parse(fs.readFileSync(configPath).toString(), fs.readFileSync("config.defaults.json").toString());
     }
 
-    public parse(content: string, defaultContent: string) {
+    public parse(content: string, defaultContent: string): void {
         const contentJSON = JSON.parse(content);
         const defaultContentJSON = JSON.parse(defaultContent);
         const configObj = _.defaultsDeep(contentJSON, defaultContentJSON);

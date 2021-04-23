@@ -8,7 +8,7 @@ export class Cron {
 
     logger = Logger.get("cron")
 
-    init() {
+    init(): void {
         this.tasks.push(new CronJob("0 0 0 * * *" , async () => { // every day at midnight
             try {
                 this.logger.info("Executing daily user data refresh task!");
@@ -23,7 +23,7 @@ export class Cron {
             task.start();
     }
 
-    stop() {
+    stop(): void {
         this.tasks.forEach((task) => task.stop());
     }
 

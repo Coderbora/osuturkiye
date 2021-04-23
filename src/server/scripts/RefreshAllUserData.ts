@@ -8,7 +8,7 @@ export default class RefreshAllUserData {
 
     CONCURRENCY = 20;
 
-    async run() {
+    async run(): Promise<void> {
         if(mongoose.connection.readyState !== 0 && App.instance.discordClient.discordClient.ws.status === 0) {
             this.logger.info("Fetching users!");
             const users = await User.find({ discord: { $exists: true } });

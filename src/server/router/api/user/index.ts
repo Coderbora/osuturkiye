@@ -9,8 +9,8 @@ export class UserRouter {
 		this.router.get("/", isDatabaseAvailable, async (req: IAppRequest, res) => {
 			res.json({
 				error: false,
-				user: (req.user) ? await req.user.getInfos() : null,
-			  });
+				user: (req.user) ? req.user.getInfos() : null,
+			});
 		});
 	}
 }

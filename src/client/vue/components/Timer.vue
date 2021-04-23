@@ -23,25 +23,25 @@ export default {
       currentTime: Date.parse(this.deadline) - Date.parse(new Date().toString())
     };
   },
-  mounted() {
+  mounted(): void {
     setTimeout(this.countdown, 1000);
   },
   computed: {
-    seconds() {
+    seconds(): number {
       return Math.floor((this.currentTime / 1000) % 60);
     },
-    minutes() {
+    minutes(): number {
       return Math.floor((this.currentTime / 1000 / 60) % 60);
     },
-    hours() {
+    hours(): number {
       return Math.floor((this.currentTime / (1000 * 60 * 60)) % 24);
     },
-    days() {
+    days(): number {
       return Math.floor(this.currentTime / (1000 * 60 * 60 * 24));
     }
   },
   methods: {
-    countdown() {
+    countdown(): void {
       this.currentTime = Date.parse(this.deadline) - Date.parse(new Date().toString());
       if (this.currentTime > 0) {
         setTimeout(this.countdown, this.speed);
@@ -49,11 +49,11 @@ export default {
         this.currentTime = null;
       }
     },
-    formatTime(value: Number) {
+    formatTime(value: number): string {
       if (value < 10) {
         return "0" + value;
       }
-      return value;
+      return value.toString();
     }
   }
 }

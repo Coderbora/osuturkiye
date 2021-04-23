@@ -13,20 +13,20 @@ export class DiscordClient {
         this.discordClient = new discord.Client()
     }
 
-    async start(token: string) {
+    async start(token: string): Promise<void> {
         await this.discordClient.login(token).catch((error) => Logger.get("discord").error("Couldn't connect to discord!", { error }));
     }
 
-    async stop() {
+    async stop(): Promise<void> {
         await this.discordClient.destroy();
     }
 
-    get discordGuild() {
+    get discordGuild(): discord.Guild {
         return this.discordClient.guilds.resolve(App.instance.config.discord.guildID);
     }
 
-    async log(info: LogEntry) {
-        if(App.instance.config.level_colors.hasOwnProperty(info.level)) {
+    async log(info: LogEntry): Promise<void> {
+        if(info.level in App.instance.config.level_colors) {
             if(!this.logChannel)
                 this.logChannel = await this.discordClient.channels.fetch(App.instance.config.discord.logChannel) as discord.TextChannel;
 
@@ -41,7 +41,7 @@ export class DiscordClient {
         }
     }
 
-    async fetchMember(id: string, ignoreCache = false) {
+    async fetchMember(id: string, ignoreCache = false): Promise<discord.GuildMember | null> {
         let discordMember = null;
 
         try {

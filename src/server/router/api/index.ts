@@ -63,8 +63,8 @@ export class ApiRouter {
             }
         }));
         
-        // @ts-ignore weird handling about strategy
         passport.use("osu", new OsuStrategy({
+            type: "StrategyOptions",
             clientID: App.instance.config.osu.clientId,
             clientSecret: App.instance.config.osu.clientSecret,
             callbackURL: App.instance.config.http.publicUrl + "/api/auth/osu/callback",
@@ -81,11 +81,11 @@ export class ApiRouter {
                         },
                     });
         
-                user.osu!.playmode = profile._json.playmode;
-                user.osu!.username = profile._json.username;
+                user.osu.playmode = profile._json.playmode;
+                user.osu.username = profile._json.username;
         
-                user.osu!.accessToken = accessToken;
-                user.osu!.refreshToken = refreshToken;
+                user.osu.accessToken = accessToken;
+                user.osu.refreshToken = refreshToken;
                 await user.save();
                 done(null, user);
             } catch(error) {

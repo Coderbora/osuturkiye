@@ -9,7 +9,7 @@ class DiscordTransport extends Transport {
     constructor(opts?: ConsoleTransportOptions) {
         super(opts)
     }
-    log(info: any, callback: () => void) {
+    log(info, callback: () => void) {
         
         if(process.env.NODE_ENV !== "development")
             App.instance.discordClient.log(info);
@@ -29,7 +29,7 @@ export abstract class Logger {
         new DiscordTransport()
     ];
 
-    static get(label?: string) {
+    static get(label?: string): winston.Logger {
         return winston.createLogger({
             format: winston.format.combine(
                 winston.format.label({ label }),

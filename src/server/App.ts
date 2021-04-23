@@ -41,7 +41,7 @@ export class App {
         }
     }
 
-    async start() {
+    async start(): Promise<void> {
         this.app.use(express.static(path.join(__dirname, "static"), { dotfiles: 'allow' }));
         this.app.use("/", (new MainRouter()).router);
 
@@ -51,40 +51,33 @@ export class App {
 
         this.cron.init();
 
-        return new Promise<void>(async (resolve, reject) => {
-            this.httpServer.listen(this.config.http.port, this.config.http.host, () => {
-                this.logger.info(`Listening HTTP requests on ${this.config.http.publicUrl} !`);
-            });
+        this.httpServer.listen(this.config.http.port, this.config.http.host, () => {
+            this.logger.info(`Listening HTTP requests on ${this.config.http.publicUrl} !`);
+        });
 
-            this.httpsServer?.listen(this.config.https.port, this.config.https.host, () => {
-                this.logger.info(`Listening HTTPS requests on ${this.config.https.publicUrl} !`);
-            });
-
-            resolve();
-        }); 
+        this.httpsServer?.listen(this.config.https.port, this.config.https.host, () => {
+            this.logger.info(`Listening HTTPS requests on ${this.config.https.publicUrl} !`);
+        });
     }
 
-    stop() {
+    async stop(): Promise<void> {
         this.logger.info("Stopping the app!");
-        return new Promise<void>(async (resolve, reject) => {
             await this.discordClient.stop();
             this.cron.stop();
             this.httpServer.close((error) => {
                 if(error) {
                     this.logger.error("Error while closing the http server!", { error });
-                    return reject(error);
+                    throw error;
                 }
             });
 
             this.httpsServer?.close((error) => {
                 if(error) {
                     this.logger.error("Error while closing the https server!", { error });
-                    return reject(error);
+                    throw error;
                 }
             });    
 
             this.logger.info("Stopped the app!");
-            resolve();
-        });
     }
 }

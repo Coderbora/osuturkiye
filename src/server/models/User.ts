@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 
-import { osuApiV2 as osuApi } from '../OsuApiV2';
+import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2';
 import { App } from '../App';
 import { DiscordAPIError } from "discord.js";
 import { Logger } from "../Logger";
-import passport from 'passport';
 
 const logger = Logger.get("UserModel");
 
@@ -58,7 +57,7 @@ export interface IUser extends mongoose.Document {
     discord?: IDiscordInformation;
     osu?: IOsuInformation;
 
-    getInfos(): Promise<IUserInformation>;
+    getInfos(): IUserInformation;
     updateUser(): Promise<void>;
     getUsername(): string;
 }
@@ -94,25 +93,25 @@ const UserSchema = new mongoose.Schema({
 
 OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): Promise<void> {
     if(Date.now() - this.lastVerified.getTime() > 86400000) { // expires after one day
-        const tokenRet = await osuApi.refreshAccessToken(this.refreshToken);
+        const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
         this.accessToken = tokenRet.access_token;
         this.refreshToken = tokenRet.refresh_token;
         this.lastVerified = new Date();
     }
 
-    const ret = await osuApi.fetchUser(undefined, this.accessToken, undefined)
+    const ret = await osuApi.fetchUser(undefined, this.accessToken, undefined) as OUserSchema
     this.username = ret.username;
     this.playmode = ret.playmode;
-    this.groups = (ret.groups as Array<{identifier: string, [prop: string]: string}>).map(e => e["identifier"]);
+    this.groups = ret.groups.map(e => e["identifier"]);
     this.isRankedMapper = ret.ranked_and_approved_beatmapset_count > 0;
     await (this.ownerDocument() as mongoose.Document).save();
 };
 
 DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInformation): Promise<void> {
-    let discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
+    const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
     if(discordMember) {
 
-        let addArray: string[] = [], removeArray: string[] = [];
+        const addArray: string[] = [], removeArray: string[] = [];
 
         Object.keys(App.instance.config.discord.roles.groupRoles).forEach(async group => {
             if((this.ownerDocument() as IUser).osu?.groups.includes(group))
@@ -151,10 +150,10 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
 };
 
 DiscordInformationSchema.methods.delink = async function(this: IDiscordInformation): Promise<void> {
-    let discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
+    const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
     if(discordMember) {
 
-        let removeArray = [App.instance.config.discord.roles.verifiedRole, App.instance.config.discord.roles.rankedMapper];
+        const removeArray = [App.instance.config.discord.roles.verifiedRole, App.instance.config.discord.roles.rankedMapper];
 
         Object.keys(App.instance.config.discord.roles.groupRoles).forEach(async group => {
             removeArray.push(App.instance.config.discord.roles.groupRoles[group]);
@@ -192,7 +191,7 @@ UserSchema.statics.deserializeUser = async function(id: string, done) {
     }
 };
 
-UserSchema.methods.getInfos = async function(this: IUser): Promise<IUserInformation> {
+UserSchema.methods.getInfos = function(this: IUser): IUserInformation {
     return {
         id: this.id,
         lastLogin: this.lastLogin,
@@ -208,16 +207,14 @@ UserSchema.methods.getInfos = async function(this: IUser): Promise<IUserInformat
 }
 
 
-UserSchema.methods.updateUser = function(this: IUser): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-        try {
-            await this.osu?.fetchUser();
-            await this.discord?.updateUser();
-            resolve();
-        } catch(err) {
-            reject(err);
-        }
-    })
+UserSchema.methods.updateUser = async function(this: IUser): Promise<void> {
+    try {
+        await this.osu?.fetchUser();
+        await this.discord?.updateUser();
+        return;
+    } catch(err) {
+        logger.error(err);
+    }
 }
 
 UserSchema.methods.getUsername = function(this: IUser): string {
