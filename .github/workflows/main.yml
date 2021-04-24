@@ -1,0 +1,33 @@
+name: TS and Node Continous Integration
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '*'
+
+jobs:
+  test_code:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v2
+      - 
+        name: Setting up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      -
+        name: Installing Dependencies
+        run: npm install
+      -
+        name: Linting
+        run: npm run lint
+      -
+        name: Building Client
+        run: npm run build:client
+      -
+        name: Building Server
+        run: npm run build:server
