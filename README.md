@@ -1,4 +1,4 @@
-# osu!Türkiye
+# osu!türkiye
 
 ### Thanks to [Corsace](https://git.cartooncraft.fr/corsace/open-2020/)'s authors for inspiring us to build efficient methods and structures!
 
