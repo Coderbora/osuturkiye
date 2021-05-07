@@ -212,7 +212,10 @@ UserSchema.methods.getInfos = function(this: IUser): IUserInformation {
     };
 
     if(this.discord != null) {
-        userObj.remainingDelinkTime = (this.discord.availableDelinkDate() as DateTime).diffNow().as("milliseconds")
+        const availableDelinkDate = this.discord.availableDelinkDate();
+        if(availableDelinkDate !== false) {
+            userObj.remainingDelinkTime = availableDelinkDate.diffNow().as("milliseconds")
+        }
     }
     
     return userObj;
