@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { DateTime } from "luxon";
 
 import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2';
 import { App } from '../App';
@@ -31,6 +32,7 @@ export interface IDiscordInformation extends mongoose.Types.Subdocument {
 
     updateUser(): Promise<void>;
     delink(): Promise<void>;
+    availableDelinkDate(): DateTime | false;
 }
 
 export interface IUserModel extends mongoose.Model<IUser> {
@@ -48,7 +50,7 @@ export interface IUserInformation {
     discordName?: string;
     osuLinked: boolean;
     discordLinked: boolean;
-    availableDelinkDate?: number;
+    remainingDelinkTime?: number;
 }
 
 export interface IUser extends mongoose.Document {
@@ -71,8 +73,8 @@ const OsuInformationSchema = new mongoose.Schema({
     username: { type: String, required: true },
     accessToken: { type: String, required: true },
     refreshToken: { type: String, required: true },
-    dateAdded: { type: Date, default: Date.now(), required: true },
-    lastVerified: { type: Date, default: Date.now(), required: true }
+    dateAdded: { type: Date, default: DateTime.now().toJSDate(), required: true },
+    lastVerified: { type: Date, default: DateTime.now().toJSDate(), required: true }
 })
 
 const DiscordInformationSchema = new mongoose.Schema({
@@ -80,24 +82,22 @@ const DiscordInformationSchema = new mongoose.Schema({
     userNameWithDiscriminator: String,
     accessToken: String,
     refreshToken: String,
-    dateAdded: { type: Date, default: Date.now() },
-    lastUpdated: { type: Date, default: Date.now() }
+    dateAdded: { type: Date, default: DateTime.now().toJSDate() },
+    lastUpdated: { type: Date, default: DateTime.now().toJSDate() }
 })
 
 const UserSchema = new mongoose.Schema({
-    registration: { type: Date, default: Date.now() },
-    lastLogin: { type: Date, default: Date.now() },
+    registration: { type: Date, default: DateTime.now().toJSDate() },
+    lastLogin: { type: Date, default: DateTime.now().toJSDate() },
     osu: OsuInformationSchema,
     discord: DiscordInformationSchema,
 })
 
 OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): Promise<void> {
-    if(Date.now() - this.lastVerified.getTime() > 86400000) { // expires after one day
-        const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
-        this.accessToken = tokenRet.access_token;
-        this.refreshToken = tokenRet.refresh_token;
-        this.lastVerified = new Date();
-    }
+    const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
+    this.accessToken = tokenRet.access_token;
+    this.refreshToken = tokenRet.refresh_token;
+    this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
 
     const ret = await osuApi.fetchUser(undefined, this.accessToken, undefined) as OUserSchema
     this.username = ret.username;
@@ -144,7 +144,7 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
             throw err;
         }
 
-        this.lastUpdated = new Date();
+        this.lastUpdated = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         await (this.ownerDocument() as mongoose.Document).save();
     }
 };
@@ -170,9 +170,16 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
             throw err;
         }
 
-        this.lastUpdated = new Date();
+        this.lastUpdated = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         await (this.ownerDocument() as mongoose.Document).save();
     }
+}
+
+DiscordInformationSchema.methods.availableDelinkDate = function(this: IDiscordInformation): DateTime | false {
+    const availableDelinkDate = DateTime.fromJSDate(this.dateAdded, { zone: App.instance.config.misc.timezone }).plus(App.instance.config.misc.cooldownDuration);
+    if(availableDelinkDate.diffNow().as("milliseconds") >= 0) {
+        return availableDelinkDate;
+    } else return false;
 }
 
 UserSchema.statics.serializeUser = function(user: IUser, done) {
@@ -192,7 +199,7 @@ UserSchema.statics.deserializeUser = async function(id: string, done) {
 };
 
 UserSchema.methods.getInfos = function(this: IUser): IUserInformation {
-    return {
+    const userObj: IUserInformation = {
         id: this.id,
         lastLogin: this.lastLogin,
         avatar_url: `https://a.ppy.sh/${this.osu?.userId}?${Date.now()}`,
@@ -202,8 +209,13 @@ UserSchema.methods.getInfos = function(this: IUser): IUserInformation {
         discordName: this.discord ? this.discord.userNameWithDiscriminator : undefined,
         osuLinked: this.osu != null,
         discordLinked: this.discord != null,
-        availableDelinkDate: this.discord != null && (Date.now() - this.discord.dateAdded.getTime()) < 86400000 ? this.discord.dateAdded.setDate(this.discord.dateAdded.getDate() + 1) : undefined
+    };
+
+    if(this.discord != null) {
+        userObj.remainingDelinkTime = (this.discord.availableDelinkDate() as DateTime).diffNow().as("milliseconds")
     }
+    
+    return userObj;
 }
 
 

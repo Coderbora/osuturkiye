@@ -51,6 +51,10 @@ export class Config {
     public session = {
         secret: ""
     };
+    public misc = {
+        cooldownDuration: 24*60*60*100,
+        timezone: "Europe/Istanbul"
+    };
     public level_colors = {
         info: "17A2B8",
         notice: "17A2B8",

@@ -2,6 +2,7 @@ import promiseRouter from "express-promise-router";
 import session from "express-session";
 import passport from "passport";
 import MongoStore from "connect-mongo";
+import { DateTime } from "luxon";
 
 import DiscordStrategy from "passport-discord";
 import OsuStrategy from 'passport-osu';
@@ -77,12 +78,12 @@ export class ApiRouter {
             try {
                 let user = await User.findOne({ "osu.userId": profile.id });
                 if(user)
-                    user.lastLogin = new Date();
+                    user.lastLogin = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
                 else
                     user = new User({
                         osu: {
                             userId: profile.id,
-                            lastVerified: new Date()
+                            lastVerified: DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate()
                         },
                     });
         

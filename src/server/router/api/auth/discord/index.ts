@@ -41,7 +41,7 @@ export class DiscordAuthRouter {
         });
 
         this.router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req: IAppRequest, res) => {
-            if(req.user?.discord && Date.now() - req.user.discord.dateAdded.getTime() > 86400000) { 
+            if(req.user?.discord && !req.user.discord.availableDelinkDate()) { 
                 const osuID = req.user.osu?.userId;
                 const discordID = req.user.discord?.userId;
             

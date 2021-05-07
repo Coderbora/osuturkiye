@@ -21,7 +21,7 @@
                 </div>
                 <i class="between fas fa-plus"></i>
                 <div class="actionBtn">
-                    <button :disabled="(!user.osuLinked && !user.discordLinked) || (user.discordLinked && user.availableDelinkDate != null)" @click="discordAction()">
+                    <button :disabled="(!user.osuLinked && !user.discordLinked) || (user.discordLinked && user.remainingDelinkTime != undefined)" @click="discordAction()">
                         <template v-if="!user.discordLinked">
                             <i id="discord" class="fab fa-discord"></i> Discord
                         </template>
@@ -31,7 +31,7 @@
                     </button>
                     <p class="alt" v-if="!user.discordLinked">LINK</p>
                     <p class="alt" v-if="user.discordLinked && !user.deadlineDate">DELINK</p>
-                    <p class="alt" v-if="user.deadlineDate"><Timer :deadline="user.deadlineDate.toISOString()"></Timer></p>
+                    <p class="alt" v-if="user.deadlineDate"><Timer :deadline="user.deadlineDate"></Timer></p>
                 </div>
             </div>
         </div>
@@ -51,9 +51,9 @@ interface UserDetails {
     discordID?: string,
     discordName?: string,
     osuLinked: boolean,
-    availableDelinkDate: number | null,
+    remainingDelinkTime?: number,
     discordLinked: boolean,
-    deadlineDate: Date
+    deadlineDate: number
 }
 
 export default {
@@ -72,17 +72,18 @@ export default {
     methods: {
         async reloadData(): Promise<void> {
             let res = await axios.get("/api/user");
-            let data = res.data.user;
+            let data = (res.data.user) as UserDetails;
             if(data) {
+                const now = new Date();
                 this.user = data;
-                if(data.availableDelinkDate)
-                    this.user.deadlineDate = new Date(data.availableDelinkDate);
+                if(data.remainingDelinkTime)
+                    this.user.deadlineDate = now.setMilliseconds(now.getMilliseconds() + data.remainingDelinkTime);
             } else {
                 this.user = this.defaultUser;
             }
         },
         loadingAnimation(button: "osu" | "discord"): void {
-            let icon;
+            let icon: HTMLElement;
             switch (button) {
                 case "osu":
                     icon = document.getElementById("osu")
