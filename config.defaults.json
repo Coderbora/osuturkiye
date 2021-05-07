@@ -48,6 +48,10 @@
     "session": {
         "secret": ""
     },
+    "misc": {
+        "cooldownDuration": 86400000,
+        "timezone": "Europe/Istanbul"
+    },
     "level_colors": {
         "info": "17A2B8",
         "success": "28A745",

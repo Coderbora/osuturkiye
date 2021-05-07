@@ -10,7 +10,7 @@
 export default {
   props: {
     deadline: {
-      type: String,
+      type: Number,
       required: true,
     },
     speed: {
@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      currentTime: Date.parse(this.deadline) - Date.parse(new Date().toString())
+      currentTime: this.deadline - Date.now()
     };
   },
   mounted(): void {
@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     countdown(): void {
-      this.currentTime = Date.parse(this.deadline) - Date.parse(new Date().toString());
+      this.currentTime = this.deadline - Date.now();
       if (this.currentTime > 0) {
         setTimeout(this.countdown, this.speed);
       } else {
