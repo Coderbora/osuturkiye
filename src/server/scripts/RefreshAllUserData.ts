@@ -6,7 +6,8 @@ import { User } from "../models/User";
 export default class RefreshAllUserData {
     logger = Logger.get("scripts/RefreshAllUserData");
 
-    CONCURRENCY = 20;
+    CONCURRENCY = 10;
+    STEP_TIMEOUT = 30*1000;
 
     async run(): Promise<void> {
         if(mongoose.connection.readyState !== 0 && App.instance.discordClient.discordClient.ws.status === 0) {
@@ -22,6 +23,12 @@ export default class RefreshAllUserData {
                     promises.push(user.updateUser().catch(error =>
                         this.logger.error("An error occured while processing this user", { error, user })
                     ));
+
+                promises.push(new Promise(resolve => {
+                    setTimeout(() => {
+                       resolve();
+                    }, this.STEP_TIMEOUT);
+                }) as Promise<void>);
     
                 await Promise.all(promises);
                 this.logger.info("Processed " + (users.length - pendingUsers.length) + " out of " + users.length);

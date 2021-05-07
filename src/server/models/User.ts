@@ -94,10 +94,12 @@ const UserSchema = new mongoose.Schema({
 })
 
 OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): Promise<void> {
-    const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
-    this.accessToken = tokenRet.access_token;
-    this.refreshToken = tokenRet.refresh_token;
-    this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
+    if(DateTime.fromJSDate(this.lastVerified, { zone: App.instance.config.misc.timezone }).diffNow("days").days >= 0.99) { // expires after one day
+        const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
+        this.accessToken = tokenRet.access_token;
+        this.refreshToken = tokenRet.refresh_token;
+        this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
+    }
 
     const ret = await osuApi.fetchUser(undefined, this.accessToken, undefined) as OUserSchema
     this.username = ret.username;
