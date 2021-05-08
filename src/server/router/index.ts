@@ -1,5 +1,6 @@
 import express from "express";
 import promiseRouter from "express-promise-router";
+import history from 'connect-history-api-fallback';
 import { ApiRouter } from "./api/index.js";
 
 import { App } from "../App";
@@ -21,8 +22,10 @@ export class MainRouter {
 
         this.router.use("/api", (new ApiRouter).router);
 
-        this.router.use("/", express.static("build/client"));
-        this.router.use("*", express.static("build/client/index.html"));
+        const staticMiddleware = express.static("build/client");
+        this.router.use(staticMiddleware);
+        this.router.use(history());
+        this.router.use(staticMiddleware);
 
         this.router.use((err, req, res, next) => {
             if (err) {
