@@ -28,6 +28,8 @@ export class App {
     public httpsServer?: https.Server;
     public credentials = {};
 
+    public clientCredential = "";
+
     constructor() {
         this.httpServer = http.createServer(this.app);
 

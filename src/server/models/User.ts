@@ -20,6 +20,7 @@ export interface IOsuInformation extends mongoose.Types.Subdocument {
     lastVerified: Date;
 
     fetchUser(): Promise<void>;
+    tryFetchUserPublic(): Promise<boolean>;
 }
 
 export interface IDiscordInformation extends mongoose.Types.Subdocument {
@@ -94,6 +95,12 @@ const UserSchema = new mongoose.Schema({
 })
 
 OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): Promise<void> {
+    const isReachable = await this.tryFetchUserPublic();
+
+    if(!isReachable) {
+        logger.warn(`User [${this.username}](https://osu.ppy.sh/users/${this.userId}) is not reachable from public!`);
+    }
+
     if(-DateTime.fromJSDate(this.lastVerified, { zone: App.instance.config.misc.timezone }).diffNow("days").days >= 0.95) { // expires after one day
         try {
             const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
@@ -112,6 +119,20 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
     this.isRankedMapper = ret.ranked_and_approved_beatmapset_count > 0;
     await (this.ownerDocument() as mongoose.Document).save();
 };
+
+OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInformation): Promise<boolean> {
+    try {
+        await osuApi.request({ endpoint: `/users/${this.userId}/${this.playmode}?key=id`, accessToken: App.instance.clientCredential });
+        return true;
+    } catch (err) {
+        if(err.code && err.code == "404")
+            return false;
+        else {
+            logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
+            return true;
+        }
+    }
+}
 
 DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInformation): Promise<void> {
     const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
