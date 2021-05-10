@@ -121,6 +121,8 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
 };
 
 OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInformation): Promise<boolean> {
+    if(App.instance.clientCredential == "") await osuApi.refreshClientCredential(); //check for empty client credential
+
     try {
         await osuApi.request({ endpoint: `/users/${this.userId}/${this.playmode}?key=id`, accessToken: App.instance.clientCredential });
         return true;
