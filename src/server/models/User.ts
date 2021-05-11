@@ -127,7 +127,7 @@ OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInfor
         await osuApi.request({ endpoint: `/users/${this.userId}/${this.playmode}?key=id`, accessToken: App.instance.clientCredential });
         return true;
     } catch (err) {
-        if(err.code && err.code == "404")
+        if(err.response?.status == "404")
             return false;
         else {
             logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
