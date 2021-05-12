@@ -1,16 +1,34 @@
 import discord from 'discord.js';
-import { Logger } from './Logger.js';
-import { App } from './App';
+import { Logger } from '../Logger';
+import { App } from '../App';
 import { DiscordAPIError } from "discord.js";
 import { LogEntry } from "winston";
+
+import { PermissionsManager } from "./PermissionsManager";
+import { CommandManager } from "./CommandManager";
 
 export class DiscordClient { 
 
     discordClient: discord.Client;
     logChannel!: discord.TextChannel;
+    permissionsManager: PermissionsManager;
+    commandManager: CommandManager;
 
     constructor() {
-        this.discordClient = new discord.Client()
+        this.discordClient = new discord.Client({ intents: [discord.Intents.FLAGS.GUILDS, discord.Intents.FLAGS.GUILD_MESSAGES] });
+        this.commandManager = new CommandManager();
+        this.permissionsManager = new PermissionsManager();
+
+        this.discordClient.on("ready", () => {
+            this.commandManager.init();
+            this.permissionsManager.init();
+        });
+
+        this.discordClient.on("interaction", async interaction => {
+            if(!interaction.isCommand()) return;
+
+            await this.commandManager.handleInteractions(interaction);
+        })
     }
 
     async start(token: string): Promise<void> {
@@ -18,7 +36,8 @@ export class DiscordClient {
     }
 
     async stop(): Promise<void> {
-        await this.discordClient.destroy();
+        await this.commandManager.stop();
+        this.discordClient.destroy();
     }
 
     get discordGuild(): discord.Guild {

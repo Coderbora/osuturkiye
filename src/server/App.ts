@@ -7,7 +7,7 @@ import https from 'https';
 import fs from 'fs';
 
 import { Logger } from './Logger';
-import { DiscordClient } from './DiscordClient';
+import { DiscordClient } from './discord/DiscordClient';
 import { Cron } from './Cron';
 
 import { Config } from './Config';

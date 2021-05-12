@@ -3,8 +3,9 @@ import { Logger } from '../Logger';
 import { App } from '../App';
 import { User } from "../models/User";
 import { osuApiV2 as osuApi } from "../OsuApiV2";
+import { IScript } from '../models/IScript';
 
-export default class RefreshAllUserData {
+export default class RefreshAllUserData implements IScript {
     logger = Logger.get("scripts/RefreshAllUserData");
 
     CONCURRENCY = 10;

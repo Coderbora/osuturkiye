@@ -55,7 +55,7 @@
     "axios": "^0.21.1",
     "connect-mongo": "^4.4.1",
     "cron": "^1.8.2",
-    "discord.js": "^12.5.1",
+    "discord.js": "github:discordjs/discord.js",
     "express": "^4.17.1",
     "express-promise-router": "^4.0.1",
     "express-session": "^1.17.1",

@@ -37,6 +37,8 @@ export class Config {
 
         logChannel: "",
 
+        administratorID: "",
+
         clientId: "",
         clientSecret: "",
         token: ""

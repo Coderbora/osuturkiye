@@ -35,12 +35,14 @@ export class osuApiV2 {
     }
   
     static async request({endpoint, accessToken}: { endpoint: string; accessToken?: string }): Promise<unknown> {
-        return (await axios(endpoint, {
+        const response = await axios(endpoint, {
             baseURL: "https://osu.ppy.sh/api/v2",
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-        })).data;
+        });
+        
+        return response.data;
     }
 
     static async refreshAccessToken(refresh_token: string): Promise<unknown> {

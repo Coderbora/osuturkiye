@@ -28,6 +28,7 @@ export interface IDiscordInformation extends mongoose.Types.Subdocument {
     userNameWithDiscriminator: string;
     accessToken: string;
     refreshToken: string;
+    permissions: string[];
     dateAdded: Date;
     lastUpdated: Date;
 
@@ -69,7 +70,7 @@ export interface IUser extends mongoose.Document {
 const OsuInformationSchema = new mongoose.Schema({
     userId: { type: Number, required: true },
     playmode: { type: String, required: true },
-    groups: { type: Array, default: [], required: true },
+    groups: { type: [String], default: [], required: true },
     isRankedMapper: { type: Boolean, default: false, required: true },
     username: { type: String, required: true },
     accessToken: { type: String, required: true },
@@ -83,6 +84,7 @@ const DiscordInformationSchema = new mongoose.Schema({
     userNameWithDiscriminator: String,
     accessToken: String,
     refreshToken: String,
+    permissions: { type: [String], default: [], required: true },
     dateAdded: { type: Date, default: DateTime.now().toJSDate() },
     lastUpdated: { type: Date, default: DateTime.now().toJSDate() }
 })
@@ -122,7 +124,6 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
 
 OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInformation): Promise<boolean> {
     if(App.instance.clientCredential == "") await osuApi.refreshClientCredential(); //check for empty client credential
-
     try {
         await osuApi.request({ endpoint: `/users/${this.userId}/${this.playmode}?key=id`, accessToken: App.instance.clientCredential });
         return true;
