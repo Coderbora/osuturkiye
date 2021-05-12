@@ -139,10 +139,8 @@ OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInfor
 
 DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInformation): Promise<void> {
     const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
-
-    const currentRoles = discordMember.roles.cache;
     if(discordMember) {
-
+        const currentRoles = discordMember.roles.cache;
         const addArray: string[] = [], removeArray: string[] = [];
 
         Object.keys(App.instance.config.discord.roles.groupRoles).forEach(async group => {
@@ -183,9 +181,8 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
 
 DiscordInformationSchema.methods.delink = async function(this: IDiscordInformation): Promise<void> {
     const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
-
-    const currentRoles = discordMember.roles.cache;
     if(discordMember) {
+        const currentRoles = discordMember.roles.cache;
 
         const removeArray = [App.instance.config.discord.roles.verifiedRole, App.instance.config.discord.roles.rankedMapper];
 
