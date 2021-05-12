@@ -2,7 +2,7 @@ import { User, IUser } from "../models/User";
 import { App } from "../App";
 import { ApplicationCommandPermissionData } from "discord.js";
 import { Logger } from '../Logger';
-import { Command, CommandReturn, COMMAND_TYPES } from "./models/ICommands";
+import { Command, CommandReturn } from "./models/ICommands";
 
 export class PermissionsManager {
 
@@ -86,23 +86,23 @@ export class PermissionsManager {
                 {
                     name: "add",
                     description: "Add permissions!",
-                    type: COMMAND_TYPES.SUB_COMMAND_GROUP,
+                    type: "SUB_COMMAND_GROUP",
                     options: [
                         {
                             name: "osu",
                             description: "osu! Resolvable (username or user id)",
-                            type: COMMAND_TYPES.SUB_COMMAND,
+                            type: "SUB_COMMAND",
                             options: [
                                 {
                                     name: "osuresolvable",
                                     description: "The osu username or user id",
-                                    type: COMMAND_TYPES.STRING,
+                                    type: "STRING",
                                     required: true
                                 },
                                 {
                                     name: "commandenum",
                                     description: "The command enum id",
-                                    type: COMMAND_TYPES.STRING,
+                                    type: "STRING",
                                     required: true,
                                     choices: choices
                                 }
@@ -111,18 +111,18 @@ export class PermissionsManager {
                         {
                             name: "discord",
                             description: "Discord User",
-                            type: COMMAND_TYPES.SUB_COMMAND,
+                            type: "SUB_COMMAND",
                             options: [
                                 {
                                     name: "user",
                                     description: "The Discord user",
-                                    type: COMMAND_TYPES.USER,
+                                    type: "USER",
                                     required: true
                                 },
                                 {
                                     name: "commandenum",
                                     description: "The command enum id",
-                                    type: COMMAND_TYPES.STRING,
+                                    type: "STRING",
                                     required: true,
                                     choices: choices
                                 }
@@ -133,23 +133,23 @@ export class PermissionsManager {
                 {
                     name: "remove",
                     description: "Remove permissions!",
-                    type: COMMAND_TYPES.SUB_COMMAND_GROUP,
+                    type: "SUB_COMMAND_GROUP",
                     options: [
                         {
                             name: "osu",
                             description: "osu! Resolvable (username or user id)",
-                            type: COMMAND_TYPES.SUB_COMMAND,
+                            type: "SUB_COMMAND",
                             options: [
                                 {
                                     name: "osuresolvable",
                                     description: "The osu username or user id",
-                                    type: COMMAND_TYPES.STRING,
+                                    type: "STRING",
                                     required: true
                                 },
                                 {
                                     name: "commandenum",
                                     description: "The command enum id",
-                                    type: COMMAND_TYPES.STRING,
+                                    type: "STRING",
                                     required: true,
                                     choices: choices
                                 }
@@ -158,18 +158,18 @@ export class PermissionsManager {
                         {
                             name: "discord",
                             description: "Discord User",
-                            type: COMMAND_TYPES.SUB_COMMAND,
+                            type: "SUB_COMMAND",
                             options: [
                                 {
                                     name: "user",
                                     description: "The Discord user",
-                                    type: COMMAND_TYPES.USER,
+                                    type: "USER",
                                     required: true
                                 },
                                 {
                                     name: "commandenum",
                                     description: "The command enum id",
-                                    type: COMMAND_TYPES.STRING,
+                                    type: "STRING",
                                     required: true,
                                     choices: choices
                                 }

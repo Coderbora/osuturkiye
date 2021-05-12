@@ -2,7 +2,7 @@
 import { readdirSync } from 'fs';
 import { resolve, extname } from 'path';
 import { App } from '../../App';
-import { Command, CommandReturn, COMMAND_TYPES } from '../models/ICommands';
+import { Command, CommandReturn } from '../models/ICommands';
 
 export default <Command>{
     commandEnum: "RUNSCRIPT",
@@ -13,7 +13,7 @@ export default <Command>{
         {
             name: "script",
             description: "Name of the script",
-            type: COMMAND_TYPES.STRING,
+            type: "STRING",
             required: true,
             choices: readdirSync(resolve(__dirname, "../../scripts")).filter(f => extname(f) === ".js")
                 .map(f => ({

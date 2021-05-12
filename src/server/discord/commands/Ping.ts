@@ -1,4 +1,4 @@
-import { Command, CommandReturn, COMMAND_TYPES } from '../models/ICommands';
+import { Command, CommandReturn } from '../models/ICommands';
 
 export default <Command>{
     commandEnum: "PING",
@@ -9,7 +9,7 @@ export default <Command>{
         {
             name: "text",
             description: "Write something!",
-            type: COMMAND_TYPES.STRING
+            type: "STRING"
         }
     ],
     call({ interaction }): CommandReturn {
