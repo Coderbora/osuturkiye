@@ -139,6 +139,8 @@ OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInfor
 
 DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInformation): Promise<void> {
     const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
+
+    const currentRoles = discordMember.roles.cache;
     if(discordMember) {
 
         const addArray: string[] = [], removeArray: string[] = [];
@@ -165,8 +167,8 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
         addArray.push(App.instance.config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray);
-            await discordMember.roles.add(addArray);
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
+            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r)));
 
             await discordMember.setNickname((this.ownerDocument() as IUser).getUsername());
         } catch(err) {
@@ -181,6 +183,8 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
 
 DiscordInformationSchema.methods.delink = async function(this: IDiscordInformation): Promise<void> {
     const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);
+
+    const currentRoles = discordMember.roles.cache;
     if(discordMember) {
 
         const removeArray = [App.instance.config.discord.roles.verifiedRole, App.instance.config.discord.roles.rankedMapper];
@@ -193,7 +197,7 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         });
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray);
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
             await discordMember.setNickname("");
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
