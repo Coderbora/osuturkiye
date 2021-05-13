@@ -2,6 +2,7 @@ import { CronJob } from "cron";
 import { DateTime } from "luxon";
 import { Logger } from "./Logger";
 import RefreshAllUserData from "./scripts/RefreshAllUserData";
+import BackupDatabase from "./scripts/BackupDatabase";
 
 import { IScript } from "./models/IScript";
 export class Cron {
@@ -18,6 +19,16 @@ export class Cron {
                 this.logger.info("Successfully completed the refresh task!");
             } catch(err) {
                 this.logger.error("An error occured while executing refresh task!", { err });
+            }
+        }));
+
+        this.tasks.push(new CronJob("0 0 2 * * 1" , async () => { // every monday at 2 AM
+            try {
+                this.logger.info("Executing weekly database backup task!");
+                await new BackupDatabase().run();
+                this.logger.info("Successfully completed the database backup task!");
+            } catch(err) {
+                this.logger.error("An error occured while executing database backup task!", { err });
             }
         }))
 

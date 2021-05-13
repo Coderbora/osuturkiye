@@ -45,7 +45,9 @@
         "clientSecret": ""
     },
     "mongo": {
-        "uri": ""
+        "uri": "",
+        
+        "backupDir": "./data/backups"
     },
     "session": {
         "secret": ""

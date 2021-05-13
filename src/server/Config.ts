@@ -48,7 +48,9 @@ export class Config {
         clientSecret: ""
     };
     public mongo = {
-        uri: ""
+        uri: "",
+
+        backupDir: "./data/backups"
     };
     public session = {
         secret: ""
