@@ -44,9 +44,17 @@ export class Cron {
             module = (new (require("./scripts/" + scriptName + ".js").default)() as IScript);
             /* eslint-enable */
             const manualJob = new CronJob(runDate.toJSDate(), async () => {
-                await module.run();
-                manualJob.stop();
-                this.tasks.splice(this.tasks.indexOf(manualJob), 1);
+                try {
+                    await module.run();
+                    manualJob.stop();
+                    this.tasks.splice(this.tasks.indexOf(manualJob), 1);
+                }
+                catch(err) {
+                    this.logger.error("An error occured while executing manual task!", { err });
+                    manualJob.stop();
+                    if(this.tasks.includes(manualJob))
+                        this.tasks.splice(this.tasks.indexOf(manualJob), 1);
+                }
             })
             this.tasks.push(manualJob);
             manualJob.start();

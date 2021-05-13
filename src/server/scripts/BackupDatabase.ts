@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { spawn } from 'child_process';
 import { parse } from 'mongodb-uri';
 import { join } from 'path';
+import { DateTime } from 'luxon';
 
 import { Logger } from '../Logger';
 import { App } from '../App';
@@ -20,9 +21,9 @@ export default class BackupDatabase implements IScript {
     
                 if(parsedUri.hosts.length < 1 || !parsedUri.database) reject("Please correctly configure your mongo settings!");
     
-                const mongodump = spawn(["mongodump", "--host", parsedUri.hosts[0].host,
-                    "--port", parsedUri.hosts[0].port, "--db", parsedUri.database, "--out",
-                     join(__dirname, '../../../', App.instance.config.mongo.backupDir, '`date +"%m-%d-%y"`')].join(" "))
+                const mongodump = spawn("mongodump", ["--host", parsedUri.hosts[0].host,
+                    "--port", parsedUri.hosts[0].port.toString(), "--db", parsedUri.database, "--out",
+                     join(__dirname, '../../../', App.instance.config.mongo.backupDir, DateTime.now().toFormat("LL-dd-yy"))])
                 
                 mongodump.on("close", (code) => {
                     if (code > 0) { 
