@@ -201,13 +201,12 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         try{ //in case of permission error during updating
             await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
             await discordMember.setNickname("");
-
-            logger.log("error", `**[${(this.ownerDocument() as IUser).getUsername()}](https://osu.ppy.sh/users/${(this.ownerDocument() as IUser).osu.userId})** \`Discord ID: ${this.userId}\` has **delinked** their Discord account.`);
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
             throw err;
         }
 
+        logger.log("error", `**[${(this.ownerDocument() as IUser).getUsername()}](https://osu.ppy.sh/users/${(this.ownerDocument() as IUser).osu.userId})** \`Discord ID: ${this.userId}\` has **delinked** their Discord account.`);
         this.lastUpdated = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         await (this.ownerDocument() as mongoose.Document).save();
     }

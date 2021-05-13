@@ -41,6 +41,7 @@ export default <Command>{
         if(user.discord) {
             await user.discord.delink();
             user.discord = undefined;
+            await user.save();
             return { message: { content: "Successfully completed the operation." } };
         } else {
             return { message: { content: "User does not have any discord information." } };
