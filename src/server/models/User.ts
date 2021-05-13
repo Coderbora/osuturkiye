@@ -40,6 +40,7 @@ export interface IDiscordInformation extends mongoose.Types.Subdocument {
 export interface IUserModel extends mongoose.Model<IUser> {
     serializeUser: (user: IUser, done: (error: Error, number: number) => void) => void;
     deserializeUser: (id: number, done: (error: Error, user: IUser) => void) => void;
+    byOsuResolvable: (osuresolvable: string) => Promise<IUser>;
 }
 
 export interface IUserInformation {
@@ -100,7 +101,11 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
     const isReachable = await this.tryFetchUserPublic();
 
     if(!isReachable) {
-        logger.warn(`User [${this.username}](https://osu.ppy.sh/users/${this.userId}) is not reachable from public!`);
+        logger.warn(`User [${this.username}](https://osu.ppy.sh/users/${this.userId}) is not reachable from public! Delinking their Discord account.`);
+        await (this.ownerDocument() as IUser).discord.delink();
+        (this.ownerDocument() as IUser).discord = undefined;
+        await (this.ownerDocument() as mongoose.Document).save();
+        return;
     }
 
     if(-DateTime.fromJSDate(this.lastVerified, { zone: App.instance.config.misc.timezone }).diffNow("days").days >= 0.95) { // expires after one day
@@ -196,6 +201,8 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         try{ //in case of permission error during updating
             await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
             await discordMember.setNickname("");
+
+            logger.log("error", `**[${(this.ownerDocument() as IUser).getUsername()}](https://osu.ppy.sh/users/${(this.ownerDocument() as IUser).osu.userId})** \`Discord ID: ${this.userId}\` has **delinked** their Discord account.`);
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
             throw err;
@@ -228,6 +235,10 @@ UserSchema.statics.deserializeUser = async function(id: string, done) {
         done(error, null);
     }
 };
+
+UserSchema.statics.byOsuResolvable = async function(osuresolvable: string): Promise<IUser> {
+    return isNaN(Number(osuresolvable)) ? await this.findOne({ "osu.username": osuresolvable }) : await this.findOne({ "osu.userId": osuresolvable })
+}
 
 UserSchema.methods.getInfos = function(this: IUser): IUserInformation {
     const userObj: IUserInformation = {

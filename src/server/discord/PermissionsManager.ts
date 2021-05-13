@@ -94,7 +94,7 @@ export class PermissionsManager {
                             type: "SUB_COMMAND",
                             options: [
                                 {
-                                    name: "osuresolvable",
+                                    name: "osu_resolvable",
                                     description: "The osu username or user id",
                                     type: "STRING",
                                     required: true
@@ -141,7 +141,7 @@ export class PermissionsManager {
                             type: "SUB_COMMAND",
                             options: [
                                 {
-                                    name: "osuresolvable",
+                                    name: "osu_resolvable",
                                     description: "The osu username or user id",
                                     type: "STRING",
                                     required: true
@@ -184,8 +184,7 @@ export class PermissionsManager {
                 const userResolvable = interaction.options[0].options[0].options[0].value.toString();
                 const commandEnum = interaction.options[0].options[0].options[1].value.toString()
 
-                const user = type == "discord" ? await User.findOne({ "discord.userId": userResolvable }) : (
-                    isNaN(Number(userResolvable)) ? await User.findOne({ "osu.username": userResolvable }) : await User.findOne({ "osu.userId": userResolvable }))
+                const user = type == "discord" ? await User.findOne({ "discord.userId": userResolvable }) : await User.byOsuResolvable(userResolvable)
                 
                 if(!user) return { message: { content: "Cannot find the user in database." } }
 

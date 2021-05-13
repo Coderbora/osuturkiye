@@ -29,7 +29,9 @@ export class DiscordAuthRouter {
                         roles: [App.instance.config.discord.roles.verifiedRole]
                     });
                 } catch(err) {
-                    if(!(err instanceof DiscordAPIError && err.code === 30001))
+                    if (err instanceof DiscordAPIError && err.code === 40007)
+                        throw ErrorCode.BANNED;
+                    else if(!(err instanceof DiscordAPIError && err.code === 30001))
                         throw err;
                 }
             }
@@ -42,15 +44,9 @@ export class DiscordAuthRouter {
 
         this.router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req: IAppRequest, res) => {
             if(req.user?.discord && !req.user.discord.availableDelinkDate()) { 
-                const osuID = req.user.osu?.userId;
-                const discordID = req.user.discord?.userId;
-            
-
                 await req.user.discord.delink();
                 req.user.discord = undefined;
                 await req.user.save();
-
-                logger.log("error", `**[${req.user.getUsername()}](https://osu.ppy.sh/users/${osuID})** \`Discord ID: ${discordID}\` has **delinked** their Discord account.`);
                 return res.json({ error: false });
             } else {
                 throw ErrorCode.FORBIDDEN;
