@@ -128,17 +128,10 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
 };
 
 OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInformation): Promise<boolean> {
-    if(App.instance.clientCredential == "") await osuApi.refreshClientCredential(); //check for empty client credential
     try {
-        await osuApi.request({ endpoint: `/users/${this.userId}/${this.playmode}?key=id`, accessToken: App.instance.clientCredential });
-        return true;
+        return await osuApi.fetchUserPublic(this.userId);
     } catch (err) {
-        if(err.response?.status == "404")
-            return false;
-        else {
-            logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
-            return true;
-        }
+        logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
     }
 }
 

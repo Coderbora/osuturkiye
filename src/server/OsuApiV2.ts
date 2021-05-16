@@ -72,4 +72,18 @@ export class osuApiV2 {
 
         App.instance.clientCredential = response.access_token;
     }
+
+    static async fetchUserPublic(userid: number): Promise<boolean> {
+        if(App.instance.clientCredential == "") await this.refreshClientCredential(); //check for empty client credential
+        try {
+            await this.request({ endpoint: `/users/${userid}/osu?key=id`, accessToken: App.instance.clientCredential });
+            return true;
+        } catch (err) {
+            if(err.response?.status == "404")
+                return false;
+            else {
+                throw err;
+            }
+        }
+    }
 }
