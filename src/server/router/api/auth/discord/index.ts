@@ -4,7 +4,7 @@ import { DiscordAPIError } from "discord.js";
 
 import { Logger } from "../../../../Logger";
 import { App } from "../../../../App";
-import { isDatabaseAvailable, isAuthenticated } from "../../../../middlewares";
+import { isDatabaseAvailable, isAuthenticated, discordAlreadyLinked } from "../../../../middlewares";
 import { ErrorCode } from "../../../../models/ErrorCodes";
 import { IAppRequest } from "../../../../models/IAppRequest";
 
@@ -17,7 +17,7 @@ export class DiscordAuthRouter {
     constructor() {
         this.router.get("/", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { scope: ['identify', 'guilds.join'] }));
 
-        this.router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { failureRedirect: "/" }) , async (req: IAppRequest, res) => {
+        this.router.get("/callback", isDatabaseAvailable, isAuthenticated, discordAlreadyLinked, passport.authenticate("discord", { failureRedirect: "/" }) , async (req: IAppRequest, res) => {
             
             const discordMember = await App.instance.discordClient.fetchMember(req.user.discord?.userId, true);
             
@@ -29,7 +29,9 @@ export class DiscordAuthRouter {
                         roles: [App.instance.config.discord.roles.verifiedRole]
                     });
                 } catch(err) {
-                    if(!(err instanceof DiscordAPIError && err.code === 30001))
+                    if (err instanceof DiscordAPIError && err.code === 40007)
+                        throw ErrorCode.BANNED;
+                    else if(!(err instanceof DiscordAPIError && err.code === 30001))
                         throw err;
                 }
             }
@@ -41,16 +43,10 @@ export class DiscordAuthRouter {
         });
 
         this.router.get("/delink", isDatabaseAvailable, isAuthenticated, async (req: IAppRequest, res) => {
-            if(req.user?.discord && Date.now() - req.user.discord.dateAdded.getTime() > 86400000) { 
-                const osuID = req.user.osu?.userId;
-                const discordID = req.user.discord?.userId;
-            
-
+            if(req.user?.discord && !req.user.discord.availableDelinkDate()) { 
                 await req.user.discord.delink();
                 req.user.discord = undefined;
                 await req.user.save();
-
-                logger.log("error", `**[${req.user.getUsername()}](https://osu.ppy.sh/users/${osuID})** \`Discord ID: ${discordID}\` has **delinked** their Discord account.`);
                 return res.json({ error: false });
             } else {
                 throw ErrorCode.FORBIDDEN;

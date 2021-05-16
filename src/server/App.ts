@@ -7,7 +7,7 @@ import https from 'https';
 import fs from 'fs';
 
 import { Logger } from './Logger';
-import { DiscordClient } from './DiscordClient';
+import { DiscordClient } from './discord/DiscordClient';
 import { Cron } from './Cron';
 
 import { Config } from './Config';
@@ -27,6 +27,8 @@ export class App {
     public httpServer: http.Server;
     public httpsServer?: https.Server;
     public credentials = {};
+
+    public clientCredential = "";
 
     constructor() {
         this.httpServer = http.createServer(this.app);

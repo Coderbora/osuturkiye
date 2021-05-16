@@ -34,6 +34,8 @@
 
         "logChannel": "",
 
+        "administratorID": "",
+
         "clientId": "",
         "clientSecret": "",
         "token": ""
@@ -43,10 +45,16 @@
         "clientSecret": ""
     },
     "mongo": {
-        "uri": ""
+        "uri": "",
+        
+        "backupDir": "./data/backups"
     },
     "session": {
         "secret": ""
+    },
+    "misc": {
+        "cooldownDuration": 86400000,
+        "timezone": "Europe/Istanbul"
     },
     "level_colors": {
         "info": "17A2B8",

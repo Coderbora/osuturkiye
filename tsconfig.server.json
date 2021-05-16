@@ -16,7 +16,8 @@
 		"src/server/index.ts"
 	],
 	"include": [
-		"src/server/scripts/*.ts"
+		"src/server/scripts/*.ts",
+		"src/server/discord/commands/*.ts"
 	],
   "exclude": ["node_modules", "data", "dist", "build", ".cache", ".github"]
 }

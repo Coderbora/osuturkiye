@@ -1,12 +1,11 @@
 import axios from 'axios';
 import { App } from './App';
 
-
 export interface CodeExchangeSchema {
     token_type: "Bearer",
     expires_in: number,
     access_token: string,
-    refresh_token: string,
+    refresh_token?: string,
 }
 
 export interface OUserGroupSchema {
@@ -36,12 +35,14 @@ export class osuApiV2 {
     }
   
     static async request({endpoint, accessToken}: { endpoint: string; accessToken?: string }): Promise<unknown> {
-        return (await axios(endpoint, {
+        const response = await axios(endpoint, {
             baseURL: "https://osu.ppy.sh/api/v2",
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-        })).data;
+        });
+        
+        return response.data;
     }
 
     static async refreshAccessToken(refresh_token: string): Promise<unknown> {
@@ -55,5 +56,20 @@ export class osuApiV2 {
                 client_secret: App.instance.config.osu.clientSecret,
             }
         })).data;
+    }
+
+    static async refreshClientCredential(): Promise<void> {
+        const response: CodeExchangeSchema = (await axios({
+            method: 'post',
+            url: "https://osu.ppy.sh/oauth/token",
+            data: {
+                grant_type: 'client_credentials',
+                scope: "public",
+                client_id: App.instance.config.osu.clientId,
+                client_secret: App.instance.config.osu.clientSecret,
+            }
+        })).data;
+
+        App.instance.clientCredential = response.access_token;
     }
 }

@@ -37,6 +37,8 @@ export class Config {
 
         logChannel: "",
 
+        administratorID: "",
+
         clientId: "",
         clientSecret: "",
         token: ""
@@ -46,10 +48,16 @@ export class Config {
         clientSecret: ""
     };
     public mongo = {
-        uri: ""
+        uri: "",
+
+        backupDir: "./data/backups"
     };
     public session = {
         secret: ""
+    };
+    public misc = {
+        cooldownDuration: 24*60*60*100,
+        timezone: "Europe/Istanbul"
     };
     public level_colors = {
         info: "17A2B8",
