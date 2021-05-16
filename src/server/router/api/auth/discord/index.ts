@@ -4,7 +4,7 @@ import { DiscordAPIError } from "discord.js";
 
 import { Logger } from "../../../../Logger";
 import { App } from "../../../../App";
-import { isDatabaseAvailable, isAuthenticated } from "../../../../middlewares";
+import { isDatabaseAvailable, isAuthenticated, discordAlreadyLinked } from "../../../../middlewares";
 import { ErrorCode } from "../../../../models/ErrorCodes";
 import { IAppRequest } from "../../../../models/IAppRequest";
 
@@ -17,7 +17,7 @@ export class DiscordAuthRouter {
     constructor() {
         this.router.get("/", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { scope: ['identify', 'guilds.join'] }));
 
-        this.router.get("/callback", isDatabaseAvailable, isAuthenticated, passport.authenticate("discord", { failureRedirect: "/" }) , async (req: IAppRequest, res) => {
+        this.router.get("/callback", isDatabaseAvailable, isAuthenticated, discordAlreadyLinked, passport.authenticate("discord", { failureRedirect: "/" }) , async (req: IAppRequest, res) => {
             
             const discordMember = await App.instance.discordClient.fetchMember(req.user.discord?.userId, true);
             

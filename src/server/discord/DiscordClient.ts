@@ -20,8 +20,10 @@ export class DiscordClient {
         this.permissionsManager = new PermissionsManager();
 
         this.discordClient.on("ready", () => {
-            this.commandManager.init();
-            this.permissionsManager.init();
+            if(process.env.NODE_ENV !== "development") {
+                this.commandManager.init();
+                this.permissionsManager.init();
+            }
         });
 
         this.discordClient.on("interaction", async interaction => {
