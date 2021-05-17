@@ -17,12 +17,17 @@ export interface OUserGroupSchema {
     colour: string
 }
 
+export interface OStatSchema {
+    global_rank: number
+}
+
 export interface OUserSchema {
     avatar_url: string,
     username: string,
     playmode: "osu" | "mania" | "fruits" | "taiko",
     groups: OUserGroupSchema[],
-    ranked_and_approved_beatmapset_count: number
+    ranked_and_approved_beatmapset_count: number,
+    statistics: OStatSchema
 }
 
 export class osuApiV2 {

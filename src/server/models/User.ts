@@ -18,6 +18,7 @@ export interface IOsuInformation extends mongoose.Types.Subdocument {
     refreshToken: string;
     dateAdded: Date;
     lastVerified: Date;
+    rank: number;
 
     fetchUser(): Promise<void>;
     tryFetchUserPublic(): Promise<boolean>;
@@ -124,6 +125,7 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
     this.playmode = ret.playmode;
     this.groups = ret.groups.map(e => e["identifier"]);
     this.isRankedMapper = ret.ranked_and_approved_beatmapset_count > 0;
+    this.rank = ret.statistics.global_rank;
     await (this.ownerDocument() as mongoose.Document).save();
 };
 

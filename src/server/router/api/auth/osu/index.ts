@@ -15,10 +15,12 @@ export class OsuAuthRouter {
                 throw ErrorCode.MISSING_PARAMETERS;
             
             const publicReachable = await req.user.osu.tryFetchUserPublic();
+            const globalRank = req.user.osu.rank;
             if (!publicReachable)
                 throw ErrorCode.BANNED;
+            if (globalRank > 2000000)
+                throw ErrorCode.LOW_RANK;
 
-            
             res.redirect("/");
         });
     }

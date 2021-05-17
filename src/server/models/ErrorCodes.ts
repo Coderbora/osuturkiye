@@ -9,6 +9,7 @@ export class ErrorCode {
     static NOT_AUTHENTICATED = new ErrorCode("NOT_AUTHENTICATED", 403, false);
     static NOT_FOUND = new ErrorCode("NOT_FOUND", 404, false);
     static TOO_MANY_REQUESTS = new ErrorCode("TOO_MANY_REQUESTS", 429, false);
+    static LOW_RANK = new ErrorCode("LOW_RANK", 403, false);
 
     static TEMPORARILY_UNAVAILABLE = new ErrorCode("TEMPORARILY_UNAVAILABLE", 503, false);
 
