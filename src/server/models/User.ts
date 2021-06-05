@@ -117,7 +117,7 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
             this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         } catch(err) {
             if(err.response.status == 401) {
-                logger.error(`Found [${this.username}](https://osu.ppy.sh/users/${this.userId}) revoked permissions for osu! application. Delinking their account.`, err);
+                logger.error(`Found [${this.username}](https://osu.ppy.sh/users/${this.userId}) revoked permissions for osu! application. Removing their account.`, err);
                 await (this.ownerDocument() as IUser).discord.delink();
                 await (this.ownerDocument() as mongoose.Document).remove();
             } else
