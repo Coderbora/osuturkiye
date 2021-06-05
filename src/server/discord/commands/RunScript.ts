@@ -23,7 +23,7 @@ export default <Command>{
         }
     ],
     call({ interaction }): CommandReturn {
-        const scriptName = interaction.options[0].value.toString();
+        const scriptName = interaction.options.find(i => i.name == "script").value.toString();
         return { message: { content: App.instance.cron.runScriptManually(scriptName) } }
     }
 }

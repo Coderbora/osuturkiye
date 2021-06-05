@@ -179,10 +179,10 @@ export class PermissionsManager {
                 }
             ],
             async call({ interaction }): Promise<CommandReturn> {
-                const action = interaction.options[0].name;
-                const type = interaction.options[0].options[0].name;
-                const userResolvable = interaction.options[0].options[0].options[0].value.toString();
-                const commandEnum = interaction.options[0].options[0].options[1].value.toString()
+                const action = interaction.options.find(i => i.type == "SUB_COMMAND_GROUP").name;
+                const type = interaction.options.find(i => i.type == "SUB_COMMAND").name;
+                const userResolvable = interaction.options.find(i => i.type == "USER").toString();
+                const commandEnum = interaction.options.find(i => i.name == "commandenum").toString()
 
                 const user = type == "discord" ? await User.findOne({ "discord.userId": userResolvable }) : await User.byOsuResolvable(userResolvable)
                 

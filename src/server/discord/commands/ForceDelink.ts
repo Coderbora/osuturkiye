@@ -12,7 +12,7 @@ export default <Command>{
             description: "Force delink someone with their osu! Resolvable",
             type: "SUB_COMMAND",
             options: [{
-                name: "osu_resolvable",
+                name: "user_resolvable",
                 description: "The osu username or user id",
                 type: "STRING",
                 required: true
@@ -23,16 +23,16 @@ export default <Command>{
             description: "Force delink someone with their Discord",
             type: "SUB_COMMAND",
             options: [{
-                name: "user",
-                description: "The Discord user",
+                name: "user_resolvable",
+                description: "The Discord User",
                 type: "USER",
                 required: true
             }]
         }
     ],
     async call({ interaction }): Promise<CommandReturn> {
-        const type = interaction.options[0].name;
-        const resolvable = interaction.options[0].options[0].value.toString();
+        const type = interaction.options.find(i => i.type == "SUB_COMMAND").name;
+        const resolvable = interaction.options.find(i => i.name == "user_resolvable").value.toString();
 
         const user = type == "discord" ? await User.findOne({ "discord.userId": resolvable }) : await User.byOsuResolvable(resolvable)
                 
