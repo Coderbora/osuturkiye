@@ -4,9 +4,10 @@
     "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "strict": true,
     "lib": ["esnext", "dom"],
     "types": ["vite/client"]
   },
-  "exclude": ["node_modules", "data", "dist", "build", ".cache", ".github"],
+  "exclude": ["node_modules", "data", "dist", "build", ".cache", ".github", "src/server"],
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

@@ -15,7 +15,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue"
+
+export default defineComponent({
     props: {
         username: {
             type: String,
@@ -68,7 +70,7 @@ export default {
             window.open(`https://osu.ppy.sh/beatmapsets/${this.mapSetId}`)
         }
     }   
-}
+})
 </script>
 
 <style scoped>
@@ -105,5 +107,6 @@ export default {
     background: linear-gradient(#800000, #FF0000);
     text-align: center;
     font-weight: 600;
+    text-shadow: #000 0px 0px 3px;
 }
 </style>

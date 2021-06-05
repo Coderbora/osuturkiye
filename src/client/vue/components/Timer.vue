@@ -7,7 +7,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue"
+
+export default defineComponent({
   props: {
     deadline: {
       type: Number,
@@ -20,7 +22,7 @@ export default {
   },
   data() {
     return {
-      currentTime: this.deadline - Date.now()
+      currentTime: (this.deadline - Date.now()) as number
     };
   },
   mounted(): void {
@@ -46,7 +48,7 @@ export default {
       if (this.currentTime > 0) {
         setTimeout(this.countdown, this.speed);
       } else {
-        this.currentTime = null;
+        this.currentTime = 0;
       }
     },
     formatTime(value: number): string {
@@ -56,5 +58,5 @@ export default {
       return value.toString();
     }
   }
-}
+})
 </script>

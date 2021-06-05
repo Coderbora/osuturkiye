@@ -9,7 +9,8 @@
                     <li class="nav-item"><router-link active-class="active" class="nav-link" to="/events">Events</router-link></li>
                 </ul>
                 <div class="navbar-nav d-flex ms-auto">
-                    <a href="" class="nav-link">LOGIN</a>
+                    <div v-if="isLogged" class="userModal"> {{ user.username }} </div>
+                    <div v-else class="loginButton"><a href="/api/auth/osu" class="nav-link">LOGIN</a></div>
                 </div>
             </nav>
         </div>
@@ -17,9 +18,16 @@
 </template>
 
 <script lang="ts">
-export default {
-    name: "Header"
-}
+import { PropType, defineComponent } from 'vue';
+import { IUserInformation } from "./types/IUser";
+
+export default defineComponent({
+    name: "Header",
+    props: {
+        isLogged: Boolean,
+        user: Object as PropType<IUserInformation>
+    }
+})
 </script>
 
 <style scoped>

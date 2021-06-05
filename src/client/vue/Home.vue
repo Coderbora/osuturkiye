@@ -14,13 +14,21 @@
                 <div class="section-card mb-3">
                     <div class="heading"><h4>Events</h4></div>
                     <div class="content">
-                        <event-entry v-for="i in 6" :key="'event'+i" :logoUrl="'./assets/favicon.png'" :deadline="'11/12'" :host="['Purpi', 'Coderbora', 'Zeus-']" :title="'vay turnuvası'"></event-entry>
+                        <event-entry v-for="i in 6" :key="'event'+i" :logoUrl="'./assets/favicon.png'" stage="Registration" :deadline="'11/12'" :host="['Purpi', 'Coderbora', 'Zeus-']" :title="'vay turnuvası'"></event-entry>
                     </div>
                 </div>
                 <div class="section-card">
                     <div class="heading"><h4>Latest Plays</h4></div>
                     <div class="content">
-                        <play-entry v-for="i in 5" :key="'play'+i" rank="X" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="XH" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="X" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="SH" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="S" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="A" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="B" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="C" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+                        <play-entry rank="D" mapSetId="1123907" userId="11873333" artist="Iwadare Noriyuki" mapTitle="Mikata 7 [Last Battle] [Finale]" pp="211" username="Coderbora"></play-entry>
+
                     </div>
                 </div>
             </div>
@@ -31,21 +39,29 @@
 import NewsEntry from "./components/entries/NewsEntry.vue";
 import EventEntry from "./components/entries/EventEntry.vue";
 import PlayEntry from "./components/entries/PlayEntry.vue";
+import { defineComponent, PropType } from "vue";
+import { IUserInformation } from "./types/IUser";
 
-export default {
+export default defineComponent({
     name: "Home",
     components: {
         NewsEntry,
         EventEntry,
         PlayEntry
     },
-    data() { return {
+    props: {
+        isLogged: Boolean,
+        user: Object as PropType<IUserInformation>,
+    },
+    data() { 
+        return {
 
-    }},
+        }
+    },
     methods: {
 
     }
-}
+})
 </script>
 
 <style scoped>
