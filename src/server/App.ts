@@ -52,6 +52,7 @@ export class App {
         await this.discordClient.start(this.config.discord.token);
 
         this.cron.init();
+        this.cron.runScriptManually("RefreshAllUserData")
 
         this.httpServer.listen(this.config.http.port, this.config.http.host, () => {
             this.logger.info(`Listening HTTP requests on ${this.config.http.publicUrl} !`);

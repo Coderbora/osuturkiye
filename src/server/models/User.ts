@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 
 import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2';
 import { App } from '../App';
-import { DiscordAPIError } from "discord.js";
+import { DiscordAPIError, Snowflake } from "discord.js";
 import { Logger } from "../Logger";
 
 const logger = Logger.get("UserModel");
@@ -115,7 +115,13 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
             this.refreshToken = tokenRet.refresh_token;
             this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         } catch(err) {
-            logger.error(`Failed to obtain new access token from user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
+            if(err.response.status == 401) {
+                logger.error(`Found [${this.username}](https://osu.ppy.sh/users/${this.userId}) revoked permissions for osu! application. Delinking their Discord account.`, err);
+                await (this.ownerDocument() as IUser).discord.delink();
+                (this.ownerDocument() as IUser).discord = undefined;
+                await (this.ownerDocument() as mongoose.Document).save();
+            } else
+                logger.error(`Failed to obtain new access token from user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
             return;
         }
     }
@@ -163,8 +169,8 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
         addArray.push(App.instance.config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
-            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r)));
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)));
+            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r as Snowflake)));
 
             await discordMember.setNickname((this.ownerDocument() as IUser).getUsername());
         } catch(err) {
@@ -192,7 +198,7 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         });
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)));
             await discordMember.setNickname("");
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
