@@ -1,6 +1,6 @@
 import { User, IUser } from "../models/User";
 import { App } from "../App";
-import { ApplicationCommandPermissionData } from "discord.js";
+import { ApplicationCommandPermissionData, Snowflake } from "discord.js";
 import { Logger } from '../Logger';
 import { Command, CommandReturn } from "./models/ICommands";
 
@@ -66,7 +66,7 @@ export class PermissionsManager {
         const permissionArray: ApplicationCommandPermissionData[] = [];
         commandUserIds.forEach(user => {
             permissionArray.push({
-                id: user,
+                id: user as Snowflake,
                 type: "USER",
                 permission: true
             });

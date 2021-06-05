@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 
 import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2';
 import { App } from '../App';
-import { DiscordAPIError } from "discord.js";
+import { DiscordAPIError, Snowflake } from "discord.js";
 import { Logger } from "../Logger";
 
 const logger = Logger.get("UserModel");
@@ -170,8 +170,8 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
         addArray.push(App.instance.config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
-            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r)));
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)));
+            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r as Snowflake)));
 
             await discordMember.setNickname((this.ownerDocument() as IUser).getUsername());
         } catch(err) {
@@ -199,7 +199,7 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         });
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r)));
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)));
             await discordMember.setNickname("");
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))

@@ -1,15 +1,14 @@
 {
+	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./build/server",
 		"rootDir": "./src/server",
 		"sourceMap": true,
 		"target": "es2015",
-		"moduleResolution": "node",
 		"module": "commonjs",
 		"lib": [
 			"es2017"
 		],
-		"esModuleInterop": true,
 		"skipLibCheck": true
 	},
 	"files": [
@@ -18,6 +17,5 @@
 	"include": [
 		"src/server/scripts/*.ts",
 		"src/server/discord/commands/*.ts"
-	],
-  "exclude": ["node_modules", "data", "dist", "build", ".cache", ".github"]
+	]
 }

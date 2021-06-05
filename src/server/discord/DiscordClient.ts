@@ -43,13 +43,13 @@ export class DiscordClient {
     }
 
     get discordGuild(): discord.Guild {
-        return this.discordClient.guilds.resolve(App.instance.config.discord.guildID);
+        return this.discordClient.guilds.resolve((App.instance.config.discord.guildID) as discord.Snowflake);
     }
 
     async log(info: LogEntry): Promise<void> {
         if(info.level in App.instance.config.level_colors) {
             if(!this.logChannel)
-                this.logChannel = await this.discordClient.channels.fetch(App.instance.config.discord.logChannel) as discord.TextChannel;
+                this.logChannel = await this.discordClient.channels.fetch((App.instance.config.discord.logChannel) as discord.Snowflake) as discord.TextChannel;
 
             await this.logChannel.send({
                 embed: {
@@ -67,7 +67,7 @@ export class DiscordClient {
 
         try {
             discordMember = await this.discordGuild?.members.fetch({
-                user: id,
+                user: id as discord.Snowflake,
                 force: ignoreCache
             });
         } catch(err) {
