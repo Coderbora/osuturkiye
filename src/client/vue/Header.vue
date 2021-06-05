@@ -9,7 +9,7 @@
                     <li class="nav-item"><router-link active-class="active" class="nav-link" to="/events">Events</router-link></li>
                 </ul>
                 <div class="navbar-nav d-flex ms-auto">
-                    <div v-if="isLogged" class="userModal"> {{ user.username }} </div>
+                    <div v-if="isLogged" class="userModal"> {{ user?.username }} </div>
                     <div v-else class="loginButton"><a href="/api/auth/osu" class="nav-link">LOGIN</a></div>
                 </div>
             </nav>

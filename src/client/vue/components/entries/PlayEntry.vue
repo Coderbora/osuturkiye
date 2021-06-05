@@ -41,7 +41,10 @@ export default defineComponent({
         },
         rank: {
             type: String,
-            required: true
+            required: true,
+            validator(this: void, value: string) {
+                return ['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D'].includes(value);
+            }
         },
         pp: {
             type: String,
@@ -59,7 +62,7 @@ export default defineComponent({
                 B: ["#EBBD48", "#553A2B"],
                 C: ["#FF855D", "#473625"],
                 D: ["#F45555", "#502020"],
-            }
+            } as { [prop: string]: string[] }
         }
     },
     methods: {
