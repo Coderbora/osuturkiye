@@ -5,6 +5,7 @@ import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2
 import { App } from '../App';
 import { DiscordAPIError, Snowflake } from "discord.js";
 import { Logger } from "../Logger";
+import { ErrorCode } from './ErrorCodes';
 
 const logger = Logger.get("UserModel");
 
@@ -116,10 +117,9 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
             this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         } catch(err) {
             if(err.response.status == 401) {
-                logger.error(`Found [${this.username}](https://osu.ppy.sh/users/${this.userId}) revoked permissions for osu! application. Delinking their Discord account.`, err);
+                logger.error(`Found [${this.username}](https://osu.ppy.sh/users/${this.userId}) revoked permissions for osu! application. Delinking their account.`, err);
                 await (this.ownerDocument() as IUser).discord.delink();
-                (this.ownerDocument() as IUser).discord = undefined;
-                await (this.ownerDocument() as mongoose.Document).save();
+                await (this.ownerDocument() as mongoose.Document).remove();
             } else
                 logger.error(`Failed to obtain new access token from user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
             return;
