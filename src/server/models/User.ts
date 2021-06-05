@@ -117,9 +117,12 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
             this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         } catch(err) {
             if(err.response.status == 401) {
-                logger.error(`Found [${this.username}](https://osu.ppy.sh/users/${this.userId}) revoked permissions for osu! application. Removing their account.`, err);
+                const username = this.username;
+                const userId = this.userId;
+                logger.warn(`Found [${username}](https://osu.ppy.sh/users/${userId}) revoked permissions for osu! application. Removing their account.`, err);
                 await (this.ownerDocument() as IUser).discord.delink();
                 await (this.ownerDocument() as mongoose.Document).remove();
+                throw `Removed [${username}](https://osu.ppy.sh/users/${userId}) 's account.`;
             } else
                 logger.error(`Failed to obtain new access token from user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
             return;
