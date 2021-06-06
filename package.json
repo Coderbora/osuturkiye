@@ -51,7 +51,7 @@
     "vite": "^2.3.6",
     "vue-hot-reload-api": "^2.3.4",
     "vue-template-compiler": "^2.6.13",
-    "vue-tsc": "0.1.2"
+    "vue-tsc": "^0.1.7"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -63,7 +63,7 @@
     "express-promise-router": "^4.0.1",
     "express-session": "^1.17.2",
     "lodash": "^4.17.21",
-    "luxon": "^1.26.0",
+    "luxon": "^1.27.0",
     "mongodb-uri": "^0.9.7",
     "mongoose": "^5.12.13",
     "passport-discord": "^0.1.4",

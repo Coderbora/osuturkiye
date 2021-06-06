@@ -14,7 +14,7 @@ export default <Command>{
     ],
     call({ interaction }): CommandReturn {
         if(interaction.options.size > 0)
-            return { message: { content: `Pong! Your message was ${interaction.options[0].value}` }};
+            return { message: { content: `Pong! Your message was ${interaction.options.find(i => i.name == "text").value}` }};
         else return { message: { content: "Pong!" }};
     }
 }

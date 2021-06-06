@@ -5,6 +5,7 @@ import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2
 import { App } from '../App';
 import { DiscordAPIError, Snowflake } from "discord.js";
 import { Logger } from "../Logger";
+import { ErrorCode } from './ErrorCodes';
 
 const logger = Logger.get("UserModel");
 
@@ -115,7 +116,15 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
             this.refreshToken = tokenRet.refresh_token;
             this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
         } catch(err) {
-            logger.error(`Failed to obtain new access token from user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
+            if(err.response.status == 401) {
+                const username = this.username;
+                const userId = this.userId;
+                logger.warn(`Found [${username}](https://osu.ppy.sh/users/${userId}) revoked permissions for osu! application. Removing their account.`, err);
+                await (this.ownerDocument() as IUser).discord.delink();
+                await (this.ownerDocument() as mongoose.Document).remove();
+                throw `Removed [${username}](https://osu.ppy.sh/users/${userId}) 's account.`;
+            } else
+                logger.error(`Failed to obtain new access token from user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
             return;
         }
     }
@@ -128,17 +137,10 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
 };
 
 OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInformation): Promise<boolean> {
-    if(App.instance.clientCredential == "") await osuApi.refreshClientCredential(); //check for empty client credential
     try {
-        await osuApi.request({ endpoint: `/users/${this.userId}/${this.playmode}?key=id`, accessToken: App.instance.clientCredential });
-        return true;
+        return await osuApi.fetchUserPublic(this.userId);
     } catch (err) {
-        if(err.response?.status == "404")
-            return false;
-        else {
-            logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
-            return true;
-        }
+        logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
     }
 }
 
