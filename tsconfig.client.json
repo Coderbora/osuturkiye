@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "target": "esnext",
+      "module": "esnext",
+      "strict": true,
+      "lib": ["esnext", "dom"],
+      "types": ["vite/client"]
+    },
+    "include": ["src/client/**/*.ts", "src/client/**/*.d.ts", "src/client/**/*.tsx", "src/client/**/*.vue"],
+    "exclude": ["src/server"]
+  }
+  
