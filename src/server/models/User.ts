@@ -77,8 +77,8 @@ const OsuInformationSchema = new mongoose.Schema({
     username: { type: String, required: true },
     accessToken: { type: String, required: true },
     refreshToken: { type: String, required: true },
-    dateAdded: { type: Date, default: DateTime.now().toJSDate(), required: true },
-    lastVerified: { type: Date, default: DateTime.now().toJSDate(), required: true }
+    dateAdded: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate(), required: true },
+    lastVerified: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate(), required: true }
 })
 
 const DiscordInformationSchema = new mongoose.Schema({
@@ -87,13 +87,13 @@ const DiscordInformationSchema = new mongoose.Schema({
     accessToken: String,
     refreshToken: String,
     permissions: { type: [String], default: [], required: true },
-    dateAdded: { type: Date, default: DateTime.now().toJSDate() },
-    lastUpdated: { type: Date, default: DateTime.now().toJSDate() }
+    dateAdded: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() },
+    lastUpdated: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() }
 })
 
 const UserSchema = new mongoose.Schema({
-    registration: { type: Date, default: DateTime.now().toJSDate() },
-    lastLogin: { type: Date, default: DateTime.now().toJSDate() },
+    registration: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() },
+    lastLogin: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() },
     osu: OsuInformationSchema,
     discord: DiscordInformationSchema,
 })
