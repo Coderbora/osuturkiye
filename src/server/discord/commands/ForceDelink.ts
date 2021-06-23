@@ -31,8 +31,9 @@ export default <Command>{
         }
     ],
     async call({ interaction }): Promise<CommandReturn> {
-        const type = interaction.options.find(i => i.type == "SUB_COMMAND").name;
-        const resolvable = interaction.options.find(i => i.name == "user_resolvable").value.toString();
+        const subcommand = interaction.options.find(i => i.type == "SUB_COMMAND");
+        const type = subcommand.name;
+        const resolvable = subcommand.options.find(i => i.name == "user_resolvable").value.toString();
 
         const user = type == "discord" ? await User.findOne({ "discord.userId": resolvable }) : await User.byOsuResolvable(resolvable)
                 

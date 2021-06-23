@@ -18,7 +18,6 @@ export class DiscordClient {
         this.discordClient = new discord.Client({ intents: [discord.Intents.FLAGS.GUILDS, discord.Intents.FLAGS.GUILD_MESSAGES] });
         this.commandManager = new CommandManager();
         this.permissionsManager = new PermissionsManager();
-
         this.discordClient.on("ready", () => {
             if(process.env.NODE_ENV !== "development") {
                 this.commandManager.init();
@@ -38,7 +37,7 @@ export class DiscordClient {
     }
 
     async stop(): Promise<void> {
-        await this.commandManager.stop();
+        if(process.env.NODE_ENV !== "development") await this.commandManager.stop();
         this.discordClient.destroy();
     }
 
@@ -52,12 +51,12 @@ export class DiscordClient {
                 this.logChannel = await this.discordClient.channels.fetch((App.instance.config.discord.logChannel) as discord.Snowflake) as discord.TextChannel;
 
             await this.logChannel.send({
-                embed: {
+                embeds: [{
                     title: info.label ? info.label : "",
                     description: info.message,
                     timestamp: info.timestamp,
                     color: App.instance.config.level_colors[info.level]
-                }
+                }]
             })
         }
     }
