@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { Logger } from '../Logger';
 import { App } from '../App';
 import { User } from "../models/User";
-import { osuApiV2 as osuApi } from "../OsuApiV2";
 import { IScript } from '../models/IScript';
 
 export default class RefreshAllUserData implements IScript {
@@ -13,10 +12,6 @@ export default class RefreshAllUserData implements IScript {
 
     async run(): Promise<void> {
         if(mongoose.connection.readyState !== 0 && App.instance.discordClient.discordClient.ws.status === 0) {
-            this.logger.info("Trying to retrieve new client credential!");
-            await osuApi.refreshClientCredential();
-            this.logger.info("Retrieved new client credential!");
-            
             this.logger.info("Fetching users!");
             const users = await User.find({ discord: { $exists: true } });
             this.logger.info(`Found ${ users.length } users to refresh!`);

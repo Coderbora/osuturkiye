@@ -12,6 +12,7 @@ import { Cron } from './Cron';
 
 import { Config } from './Config';
 import { MainRouter } from './router/index';
+import { DateTime } from 'luxon';
 
 mongoose.Promise = global.Promise
 
@@ -28,7 +29,10 @@ export class App {
     public httpsServer?: https.Server;
     public credentials = {};
 
-    public clientCredential = "";
+    public clientCredential = {
+        token: "",
+        lastFetched: DateTime.now().minus({ day: 1 }),
+    };
 
     constructor() {
         this.httpServer = http.createServer(this.app);

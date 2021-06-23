@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { DateTime } from 'luxon';
 import { App } from './App';
 
 export interface CodeExchangeSchema {
@@ -22,7 +23,8 @@ export interface OUserSchema {
     username: string,
     playmode: "osu" | "mania" | "fruits" | "taiko",
     groups: OUserGroupSchema[],
-    ranked_and_approved_beatmapset_count: number
+    ranked_beatmapset_count: number,
+    is_restricted: boolean
 }
 
 export class osuApiV2 {
@@ -59,6 +61,7 @@ export class osuApiV2 {
     }
 
     static async refreshClientCredential(): Promise<void> {
+        if(App.instance.clientCredential.lastFetched.diffNow("days").days < 0.95) return;
         const response: CodeExchangeSchema = (await axios({
             method: 'post',
             url: "https://osu.ppy.sh/oauth/token",
@@ -70,13 +73,16 @@ export class osuApiV2 {
             }
         })).data;
 
-        App.instance.clientCredential = response.access_token;
+        App.instance.clientCredential = {
+            token: response.access_token,
+            lastFetched: DateTime.now().setZone(App.instance.config.misc.timezone),
+        };
     }
 
     static async fetchUserPublic(userid: number): Promise<boolean> {
-        if(App.instance.clientCredential == "") await this.refreshClientCredential(); //check for empty client credential
+        await this.refreshClientCredential(); //check for empty client credential
         try {
-            await this.request({ endpoint: `/users/${userid}/osu?key=id`, accessToken: App.instance.clientCredential });
+            await this.request({ endpoint: `/users/${userid}/osu?key=id`, accessToken: App.instance.clientCredential.token });
             return true;
         } catch (err) {
             if(err.response?.status == "404")

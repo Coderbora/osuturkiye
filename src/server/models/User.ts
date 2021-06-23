@@ -5,7 +5,6 @@ import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2
 import { App } from '../App';
 import { DiscordAPIError, Snowflake } from "discord.js";
 import { Logger } from "../Logger";
-import { ErrorCode } from './ErrorCodes';
 
 const logger = Logger.get("UserModel");
 
@@ -21,7 +20,6 @@ export interface IOsuInformation extends mongoose.Types.Subdocument {
     lastVerified: Date;
 
     fetchUser(): Promise<void>;
-    tryFetchUserPublic(): Promise<boolean>;
 }
 
 export interface IDiscordInformation extends mongoose.Types.Subdocument {
@@ -99,16 +97,6 @@ const UserSchema = new mongoose.Schema({
 })
 
 OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): Promise<void> {
-    const isReachable = await this.tryFetchUserPublic();
-
-    if(!isReachable) {
-        logger.warn(`User [${this.username}](https://osu.ppy.sh/users/${this.userId}) is not reachable from public! Delinking their Discord account.`);
-        await (this.ownerDocument() as IUser).discord.delink();
-        (this.ownerDocument() as IUser).discord = undefined;
-        await (this.ownerDocument() as mongoose.Document).save();
-        return;
-    }
-
     if(-DateTime.fromJSDate(this.lastVerified, { zone: App.instance.config.misc.timezone }).diffNow("days").days >= 0.95) { // expires after one day
         try {
             const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
@@ -128,21 +116,21 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
             return;
         }
     }
-    const ret = await osuApi.fetchUser(undefined, this.accessToken, undefined) as OUserSchema
-    this.username = ret.username;
+    const ret = await osuApi.fetchUser(undefined, this.accessToken, undefined) as OUserSchema;
+
+    if(ret.is_restricted) {
+        logger.warn(`User [${this.username}](https://osu.ppy.sh/users/${this.userId}) is not reachable from public! Delinking their Discord account.`);
+        await (this.ownerDocument() as IUser).discord.delink();
+        (this.ownerDocument() as IUser).discord = undefined;
+        await (this.ownerDocument() as mongoose.Document).save();
+        return;
+    }
+
     this.playmode = ret.playmode;
     this.groups = ret.groups.map(e => e["identifier"]);
-    this.isRankedMapper = ret.ranked_and_approved_beatmapset_count > 0;
+    this.isRankedMapper = ret.ranked_beatmapset_count > 0;
     await (this.ownerDocument() as mongoose.Document).save();
 };
-
-OsuInformationSchema.methods.tryFetchUserPublic = async function(this: IOsuInformation): Promise<boolean> {
-    try {
-        return await osuApi.fetchUserPublic(this.userId);
-    } catch (err) {
-        logger.error(`Error occured while fetching user public of user [${this.username}](https://osu.ppy.sh/users/${this.userId})`, err);
-    }
-}
 
 DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInformation): Promise<void> {
     const discordMember = await App.instance.discordClient.fetchMember(this.userId, true);

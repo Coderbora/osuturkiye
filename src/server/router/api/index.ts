@@ -17,7 +17,6 @@ import { UserRouter } from "./user/index";
 
 import { isDatabaseAvailable } from "../../middlewares";
 import { App } from "../../App";
-import { osuApiV2 as osuApi } from "../../OsuApiV2";
 
 export class ApiRouter {
     public readonly router = promiseRouter();
@@ -77,8 +76,7 @@ export class ApiRouter {
             callbackURL: App.instance.config.http.publicUrl + "/api/auth/osu/callback",
         }, async (accessToken, refreshToken, profile, done) => {
             try {
-                const publicReachable = await osuApi.fetchUserPublic(profile.id);
-                if (!publicReachable) {
+                if (profile._json.is_restricted) {
                     passportLogger.warn(`User **[${profile._json.username}](https://osu.ppy.sh/users/${profile.id})** tried to login with restricted account.`);
                     done(ErrorCode.BANNED as Error);
                 }
@@ -102,7 +100,7 @@ export class ApiRouter {
                 await user.save();
                 done(null, user);
             } catch(error) {
-                passportLogger.error("Error while authenticating user via Osu", { error });
+                passportLogger.error("Error while authenticating user via osu!", { error });
                 done(error);
             }
         }));

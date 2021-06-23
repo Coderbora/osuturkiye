@@ -14,11 +14,6 @@ export class OsuAuthRouter {
             if (!req.query.code || req.query.error)
                 throw ErrorCode.MISSING_PARAMETERS;
             
-            const publicReachable = await req.user.osu.tryFetchUserPublic();
-            if (!publicReachable)
-                throw ErrorCode.BANNED;
-
-            
             res.redirect("/");
         });
     }
