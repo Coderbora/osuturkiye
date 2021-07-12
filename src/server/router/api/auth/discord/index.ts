@@ -1,6 +1,6 @@
 import promiseRouter from "express-promise-router";
 import passport from "passport";
-import { DiscordAPIError, Snowflake } from "discord.js";
+import { DiscordAPIError, RoleResolvable, Snowflake } from "discord.js";
 
 import { Logger } from "../../../../Logger";
 import { App } from "../../../../App";
@@ -26,7 +26,7 @@ export class DiscordAuthRouter {
                     await App.instance.discordClient.discordGuild?.addMember(req.user.discord?.userId as Snowflake, {
                         accessToken: req.user.discord?.accessToken,
                         nick: req.user.osu?.username,
-                        roles: [App.instance.config.discord.roles.verifiedRole]
+                        roles: [App.instance.config.discord.roles.verifiedRole as RoleResolvable]
                     });
                 } catch(err) {
                     if (err instanceof DiscordAPIError && err.code === 40007)

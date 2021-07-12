@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as _ from "lodash";
+import { Settings } from 'luxon';
 
 export class Config {
     public http = {
@@ -82,5 +83,7 @@ export class Config {
         Object.entries(configObj).forEach(([key, value]) => {
             this[key] = value;
         });
+
+        Settings.defaultZoneName = this.misc.timezone;
     }
 }

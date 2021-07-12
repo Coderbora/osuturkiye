@@ -19,12 +19,21 @@
         "vue",
         "@typescript-eslint"
     ],
+    "overrides": [
+        {
+          "files": ["src/server/*.ts"], // Or *.test.js
+          "rules": {
+            "vue/script-setup-uses-vars": "off"
+          }
+        }
+    ],
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": [
             "error",
             {
               "allowedNames": ["data"]
             }
-        ]
+        ],
+        "vue/script-setup-uses-vars": "off"
     }
 }

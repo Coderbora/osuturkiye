@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 
 import { osuApiV2 as osuApi, CodeExchangeSchema, OUserSchema } from '../OsuApiV2';
 import { App } from '../App';
-import { DiscordAPIError, Snowflake } from "discord.js";
+import { DiscordAPIError, RoleResolvable, Snowflake } from "discord.js";
 import { Logger } from "../Logger";
 
 const logger = Logger.get("UserModel");
@@ -75,8 +75,8 @@ const OsuInformationSchema = new mongoose.Schema({
     username: { type: String, required: true },
     accessToken: { type: String, required: true },
     refreshToken: { type: String, required: true },
-    dateAdded: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate(), required: true },
-    lastVerified: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate(), required: true }
+    dateAdded: { type: Date, default: () => DateTime.now().toJSDate(), required: true },
+    lastVerified: { type: Date, default: () => DateTime.now().toJSDate(), required: true }
 })
 
 const DiscordInformationSchema = new mongoose.Schema({
@@ -85,24 +85,24 @@ const DiscordInformationSchema = new mongoose.Schema({
     accessToken: String,
     refreshToken: String,
     permissions: { type: [String], default: [], required: true },
-    dateAdded: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() },
-    lastUpdated: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() }
+    dateAdded: { type: Date, default: () => DateTime.now().toJSDate() },
+    lastUpdated: { type: Date, default: () => DateTime.now().toJSDate() }
 })
 
 const UserSchema = new mongoose.Schema({
-    registration: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() },
-    lastLogin: { type: Date, default: () => DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate() },
+    registration: { type: Date, default: () => DateTime.now().toJSDate() },
+    lastLogin: { type: Date, default: () => DateTime.now().toJSDate() },
     osu: OsuInformationSchema,
     discord: DiscordInformationSchema,
 })
 
 OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): Promise<void> {
-    if(-DateTime.fromJSDate(this.lastVerified, { zone: App.instance.config.misc.timezone }).diffNow("days").days >= 0.95) { // expires after one day
+    if(-DateTime.fromJSDate(this.lastVerified).diffNow("days").days >= 0.95) { // expires after one day
         try {
             const tokenRet = (await osuApi.refreshAccessToken(this.refreshToken)) as CodeExchangeSchema;
             this.accessToken = tokenRet.access_token;
             this.refreshToken = tokenRet.refresh_token;
-            this.lastVerified = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
+            this.lastVerified = DateTime.now().toJSDate();
         } catch(err) {
             if(err.response.status == 401) {
                 const username = this.username;
@@ -160,8 +160,8 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
         addArray.push(App.instance.config.discord.roles.verifiedRole);
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)));
-            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r as Snowflake)));
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)) as RoleResolvable[]);
+            await discordMember.roles.add(addArray.filter(r => !currentRoles.has(r as Snowflake)) as RoleResolvable[]);
 
             await discordMember.setNickname((this.ownerDocument() as IUser).getUsername());
         } catch(err) {
@@ -169,7 +169,7 @@ DiscordInformationSchema.methods.updateUser = async function(this: IDiscordInfor
             throw err;
         }
 
-        this.lastUpdated = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
+        this.lastUpdated = DateTime.now().toJSDate();
         await (this.ownerDocument() as mongoose.Document).save();
     }
 };
@@ -189,7 +189,7 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         });
     
         try{ //in case of permission error during updating
-            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)));
+            await discordMember.roles.remove(removeArray.filter(r => currentRoles.has(r as Snowflake)) as RoleResolvable[]);
             await discordMember.setNickname("");
         } catch(err) {
             if(!(err instanceof DiscordAPIError && err.code === 50013))
@@ -197,13 +197,13 @@ DiscordInformationSchema.methods.delink = async function(this: IDiscordInformati
         }
 
         logger.log("error", `**[${(this.ownerDocument() as IUser).getUsername()}](https://osu.ppy.sh/users/${(this.ownerDocument() as IUser).osu.userId})** \`Discord ID: ${this.userId}\` has **delinked** their Discord account.`);
-        this.lastUpdated = DateTime.now().setZone(App.instance.config.misc.timezone).toJSDate();
+        this.lastUpdated = DateTime.now().toJSDate();
         await (this.ownerDocument() as mongoose.Document).save();
     }
 }
 
 DiscordInformationSchema.methods.availableDelinkDate = function(this: IDiscordInformation): DateTime | false {
-    const availableDelinkDate = DateTime.fromJSDate(this.dateAdded, { zone: App.instance.config.misc.timezone }).plus(App.instance.config.misc.cooldownDuration);
+    const availableDelinkDate = DateTime.fromJSDate(this.dateAdded).plus(App.instance.config.misc.cooldownDuration);
     if(availableDelinkDate.diffNow().as("milliseconds") >= 0) {
         return availableDelinkDate;
     } else return false;

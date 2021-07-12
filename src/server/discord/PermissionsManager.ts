@@ -72,7 +72,7 @@ export class PermissionsManager {
             });
         });
         
-        await appCommand.setPermissions(permissionArray);
+        await appCommand.permissions.set({ permissions: permissionArray });
     }
 
     private buildPermissionsCommand() {
