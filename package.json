@@ -64,7 +64,7 @@
     "lodash": "^4.17.21",
     "luxon": "^1.28.0",
     "mongodb-uri": "^0.9.7",
-    "mongoose": "^5.13.2",
+    "mongoose": "^6.0.2",
     "passport-discord": "^0.1.4",
     "passport-osu": "^1.0.8",
     "simple-oauth2": "^4.2.0",
