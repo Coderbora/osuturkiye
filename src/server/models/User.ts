@@ -126,6 +126,7 @@ OsuInformationSchema.methods.fetchUser = async function(this: IOsuInformation): 
         return;
     }
 
+    this.username = ret.username;
     this.playmode = ret.playmode;
     this.groups = ret.groups.map(e => e["identifier"]);
     this.isRankedMapper = ret.ranked_beatmapset_count > 0;
