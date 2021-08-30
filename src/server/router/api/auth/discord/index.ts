@@ -23,7 +23,7 @@ export class DiscordAuthRouter {
             
             if (!discordMember) {
                 try {
-                    await App.instance.discordClient.discordGuild?.addMember(req.user.discord?.userId as Snowflake, {
+                    await App.instance.discordClient.discordGuild?.members.add(req.user.discord?.userId as Snowflake, {
                         accessToken: req.user.discord?.accessToken,
                         nick: req.user.osu?.username,
                         roles: [App.instance.config.discord.roles.verifiedRole as RoleResolvable]

@@ -1,4 +1,4 @@
-import { User } from '../../models/User';
+import { IUser, User } from '../../models/User';
 import { Command, CommandReturn } from '../models/ICommands';
 
 export default <Command>{
@@ -31,12 +31,16 @@ export default <Command>{
         }
     ],
     async call({ interaction }): Promise<CommandReturn> {
-        const subcommand = interaction.options.find(i => i.type == "SUB_COMMAND");
-        const type = subcommand.name;
-        const resolvable = subcommand.options.find(i => i.name == "user_resolvable").value.toString();
+        const type = interaction.options.getSubcommand();
+       
+        let user: IUser | null;
 
-        const user = type == "discord" ? await User.findOne({ "discord.userId": resolvable }) : await User.byOsuResolvable(resolvable)
-                
+        if (type == "discord") {
+            user = await User.findOne({ "discord.userId": interaction.options.getMember("user_resolvable", false) });
+        } else if (type == "osu") {
+            user = await User.byOsuResolvable(interaction.options.getString("osu_resolvable"));
+        } else user = null;
+
         if(!user) return { message: { content: "Cannot find the user in database." } }
 
         if(user.discord) {

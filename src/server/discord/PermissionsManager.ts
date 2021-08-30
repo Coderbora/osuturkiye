@@ -179,16 +179,18 @@ export class PermissionsManager {
                 }
             ],
             async call({ interaction }): Promise<CommandReturn> {
-                const subcommand_group = interaction.options.find(i => i.type == "SUB_COMMAND_GROUP");
-                const action = subcommand_group.name;
+                const action = interaction.options.getSubcommandGroup();
+                const type = interaction.options.getSubcommand();
 
-                const subcommand = subcommand_group.options.find(i => i.type == "SUB_COMMAND");
-                const type = subcommand.name;
+                const commandEnum = interaction.options.getString("commandenum");
 
-                const userResolvable = subcommand.options.find(i => i.type == "USER").toString();
-                const commandEnum = subcommand.options.find(i => i.name == "commandenum").toString()
+                let user: IUser | null;
 
-                const user = type == "discord" ? await User.findOne({ "discord.userId": userResolvable }) : await User.byOsuResolvable(userResolvable)
+                if (type == "discord") {
+                    user = await User.findOne({ "discord.userId": interaction.options.getMember("user", false) });
+                } else if (type == "osu") {
+                    user = await User.byOsuResolvable(interaction.options.getString("osu_resolvable"));
+                } else user = null;
                 
                 if(!user) return { message: { content: "Cannot find the user in database." } }
 
