@@ -54,7 +54,7 @@
     "vue-tsc": "^0.1.7"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.22.0",
     "connect-mongo": "^4.4.1",
     "cron": "^1.8.2",
     "discord.js": "^13.1.0",
