@@ -31,7 +31,7 @@ export class App {
 
     public clientCredential = {
         token: "",
-        lastFetched: DateTime.now().minus({ day: 1 }),
+        lastFetched: DateTime.now().minus({ days: 1 }),
     };
 
     constructor() {

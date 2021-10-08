@@ -84,6 +84,6 @@ export class Config {
             this[key] = value;
         });
 
-        Settings.defaultZoneName = this.misc.timezone;
+        Settings.defaultZone = this.misc.timezone;
     }
 }
