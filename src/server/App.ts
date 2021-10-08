@@ -51,7 +51,7 @@ export class App {
         this.app.use(express.static(path.join(__dirname, "static"), { dotfiles: 'allow' }));
         this.app.use("/", (new MainRouter()).router);
 
-        mongoose.connect(this.config.mongo.uri, { autoIndex: false, useNewUrlParser: true });
+        mongoose.connect(this.config.mongo.uri);
 
         await this.discordClient.start(this.config.discord.token);
 
