@@ -6,8 +6,8 @@ This project is still under development in sub-branches, if you want to contribu
 
 ## Requirements
 
-- Node.js version 14 or higher
-- MongoDB version 3 or higher
+- Node.js version 16 or higher
+- MongoDB version 4 or higher
 - Discord application with enabled bot account which can be created from [here](https://discord.com/developers/applications)
 - osu! OAuth application which can be created from [here](https://osu.ppy.sh/home/account/edit)
 

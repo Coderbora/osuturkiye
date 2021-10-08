@@ -2,6 +2,10 @@ name: TS and Node Continous Integration
 
 on:
   push:
+    commit-ignore:
+      - [skip ci]
+      - [ci skip]
+      - ***NO_CI***
     branches:
       - '**'
     tags:
