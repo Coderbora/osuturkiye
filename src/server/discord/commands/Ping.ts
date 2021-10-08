@@ -13,8 +13,10 @@ export default <Command>{
         }
     ],
     call({ interaction }): CommandReturn {
-        if(interaction.options.size > 0)
-            return { message: { content: `Pong! Your message was ${interaction.options.find(i => i.name == "text").value}` }};
+        const text = interaction.options.getString("text", false);
+
+        if(text)
+            return { message: { content: `Pong! Your message was ${text}` }};
         else return { message: { content: "Pong!" }};
     }
 }

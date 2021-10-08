@@ -71,8 +71,8 @@ export default {
     }},
     methods: {
         async reloadData(): Promise<void> {
-            let res = await axios.get("/api/user");
-            let data = (res.data.user) as UserDetails;
+            let res = await axios.get<{user: UserDetails}>("/api/user");
+            let data = res.data.user;
             if(data) {
                 const now = new Date();
                 this.user = data;
