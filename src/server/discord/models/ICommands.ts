@@ -1,6 +1,6 @@
-import { CommandInteraction, MessageOptions, ApplicationCommand } from "discord.js";
+import { CommandInteraction, MessageOptions, ChatInputApplicationCommandData } from "discord.js";
 
-export interface Command extends ApplicationCommand {
+export interface Command extends ChatInputApplicationCommandData {
     commandEnum: string;
     defaultPermission: boolean;
     fileName?: string;
