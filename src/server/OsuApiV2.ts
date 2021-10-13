@@ -62,15 +62,11 @@ export class osuApiV2 {
 
     static async refreshClientCredential(): Promise<void> {
         if(App.instance.clientCredential.lastFetched.diffNow("days").days < 0.95) return;
-        const response: CodeExchangeSchema = (await axios({
-            method: 'post',
-            url: "https://osu.ppy.sh/oauth/token",
-            data: {
-                grant_type: 'client_credentials',
-                scope: "public",
-                client_id: App.instance.config.osu.clientId,
-                client_secret: App.instance.config.osu.clientSecret,
-            }
+        const response = (await axios.post<CodeExchangeSchema>("https://osu.ppy.sh/oauth/token", {
+            grant_type: 'client_credentials',
+            scope: "public",
+            client_id: App.instance.config.osu.clientId,
+            client_secret: App.instance.config.osu.clientSecret,
         })).data;
 
         App.instance.clientCredential = {
