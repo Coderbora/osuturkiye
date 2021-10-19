@@ -29,7 +29,8 @@
                 "taiko": "",
                 "fruits": ""
             },
-            "rankedMapper": ""
+            "rankedMapper": "",
+            "foreigner": ""
         },
 
         "logChannel": "",
@@ -54,7 +55,8 @@
     },
     "misc": {
         "cooldownDuration": 86400000,
-        "timezone": "Europe/Istanbul"
+        "timezone": "Europe/Istanbul",
+        "defaultCountryCode": "TR"
     },
     "level_colors": {
         "info": "17A2B8",

@@ -19,6 +19,7 @@ export interface OUserGroupSchema {
 }
 
 export interface OUserSchema {
+    country_code: string,
     avatar_url: string,
     username: string,
     playmode: "osu" | "mania" | "fruits" | "taiko",

@@ -33,7 +33,8 @@ export class Config {
                 taiko: "",
                 fruits: ""
             },
-            rankedMapper: ""
+            rankedMapper: "",
+            foreigner: ""
         },
 
         logChannel: "",
@@ -58,7 +59,8 @@ export class Config {
     };
     public misc = {
         cooldownDuration: 24*60*60*100,
-        timezone: "Europe/Istanbul"
+        timezone: "Europe/Istanbul",
+        defaultCountryCode: "TR"
     };
     public level_colors = {
         info: "17A2B8",
