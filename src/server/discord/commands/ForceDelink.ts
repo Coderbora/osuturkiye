@@ -36,9 +36,13 @@ export default <Command>{
         let user: IUser | null;
 
         if (type == "discord") {
-            user = await User.findOne({ "discord.userId": interaction.options.getMember("user_resolvable", false) });
+            const guildMember = interaction.options.getUser("user_resolvable", false);
+
+            if (guildMember)
+                user = await User.findOne({ "discord.userId": guildMember.id });
+            else user = null;
         } else if (type == "osu") {
-            user = await User.byOsuResolvable(interaction.options.getString("osu_resolvable"));
+            user = await User.byOsuResolvable(interaction.options.getString("user_resolvable"));
         } else user = null;
 
         if(!user) return { message: { content: "Cannot find the user in database." } }
