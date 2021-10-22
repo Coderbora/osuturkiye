@@ -25,7 +25,7 @@ export class DiscordClient {
             }
         });
 
-        this.discordClient.on("interaction", async interaction => {
+        this.discordClient.on("interactionCreate", async interaction => {
             if(!interaction.isCommand()) return;
 
             await this.commandManager.handleInteractions(interaction);
