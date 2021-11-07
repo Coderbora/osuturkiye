@@ -62,7 +62,7 @@ export class osuApiV2 {
     }
 
     static async refreshClientCredential(): Promise<void> {
-        if(App.instance.clientCredential.lastFetched.diffNow("days").days < 0.95) return;
+        if(Math.abs(App.instance.clientCredential.lastFetched.diffNow("days").days) < 0.95) return;
         const response = (await axios.post<CodeExchangeSchema>("https://osu.ppy.sh/oauth/token", {
             grant_type: 'client_credentials',
             scope: "public",
