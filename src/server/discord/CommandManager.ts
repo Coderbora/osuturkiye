@@ -49,7 +49,10 @@ export class CommandManager extends BaseManager {
             this.initializedCommands.splice(existingAppCommandIndex, 1);
         }
 
-        const appCommand = await App.instance.discordClient.discordGuild.commands.create(command);
+        const appCommand = await App.instance.discordClient.discordGuild.commands.create({
+            ...command,
+            //default_member_permissions: !command.defaultPermission ? "0" : undefined // waiting this to be implemented, check out osuturkiye#116
+        });
         appCommand["commandEnum"] = command.commandEnum;
         this.initializedCommands.push(appCommand);
 
@@ -58,6 +61,11 @@ export class CommandManager extends BaseManager {
 
     async handleInteractions(interaction: CommandInteraction): Promise<void> {
         const command = this.commands.find(command => command.name === interaction.commandName);
+        if (!command.defaultPermission && !command.permissions.includes(interaction.user.id)) {
+            await interaction.reply("You are not permitted to use this command!");
+            return;
+        }
+
         const commandReturn = await command.call({ interaction });
 
         interaction.reply(commandReturn.message);

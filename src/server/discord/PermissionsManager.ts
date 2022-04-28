@@ -1,6 +1,5 @@
 import { User, IUser } from "../models/User";
 import { App } from "../App";
-import { ApplicationCommandPermissionData, Snowflake } from "discord.js";
 import { Logger } from '../Logger';
 import { Command, CommandReturn } from "./models/ICommands";
 
@@ -53,8 +52,8 @@ export class PermissionsManager {
     }
 
     async loadCommandPermission(commandEnum: string): Promise<void> {
-        const appCommand = App.instance.discordClient.commandManager.getAppCommand(commandEnum);
-        if (!appCommand) throw "There is no command with this enum.";
+        const command = App.instance.discordClient.commandManager.getCommand(commandEnum);
+        if (!command) throw "There is no command with this enum.";
 
         const commandUsers = await this.fetchCommandUsers(commandEnum);
         const commandUserIds = commandUsers.map(user => user.discord.userId);
@@ -63,16 +62,7 @@ export class PermissionsManager {
             && commandUserIds.indexOf(App.instance.config.discord.administratorID) === -1)
             commandUserIds.push(App.instance.config.discord.administratorID)
         
-        const permissionArray: ApplicationCommandPermissionData[] = [];
-        commandUserIds.forEach(user => {
-            permissionArray.push({
-                id: user as Snowflake,
-                type: "USER",
-                permission: true
-            });
-        });
-        
-        await appCommand.permissions.set({ permissions: permissionArray });
+        command.permissions = commandUserIds;
     }
 
     private buildPermissionsCommand() {

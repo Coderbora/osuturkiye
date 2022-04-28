@@ -4,6 +4,7 @@ export interface Command extends ChatInputApplicationCommandData {
     commandEnum: string;
     defaultPermission: boolean;
     fileName?: string;
+    permissions?: string[]
     call: (obj?: CommandObject) => CommandReturn | Promise<CommandReturn>;
 }
 
